@@ -1,0 +1,18 @@
+- Meeting notes: Atlas rollout check-in with Advisor
+    - Rollout status
+        - Staging environment is stable, no blocking bugs since last week
+        - Production rollout still targeted for end of January
+        - Advisor flagged that the onboarding flow needs one more usability pass before go-live
+    - Scope discussion
+        - Agreed to cut the export-to-PDF feature from v1, it can ship in v1.1 instead
+        - Search filters stay in scope, they are core to the Atlas value proposition
+        - Advisor asked for a lightweight usage dashboard so Meridian leadership can see adoption numbers post-launch
+    - Technical decision
+        - Discussed whether to cache search results client side or server side
+        - Decided on server side caching first, it is simpler to invalidate and monitor
+        - Will revisit client side caching only if latency becomes a real complaint after launch
+    - Action items:
+        - Run one more usability pass on the onboarding flow (Advisor, January 13)
+        - Draft the v1.1 scope note for the deferred export feature (owner, January 10)
+        - Stand up the server side cache for search results (owner, January 17)
+        - Sketch the usage dashboard requirements for Meridian leadership (Advisor, January 20)

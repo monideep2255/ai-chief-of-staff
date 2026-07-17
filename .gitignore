@@ -1,0 +1,12 @@
+# Claude Code local state, never committed
+.claude/.cc-writes/
+
+# OS cruft
+.DS_Store
+
+# Editor state
+.vscode/
+.idea/
+
+# Secrets (real .env files only, not the example)
+.env
