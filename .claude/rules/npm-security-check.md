@@ -161,6 +161,6 @@ If any compromised version was installed during the attack window: rotate all se
 ### Do NOT apply when
 
 - cargo, gem, go get (not yet covered, separate security tooling)
-- This repo: personal-os-work has no package dependencies
+- This repo has no package dependencies
 
 The test: did I verify the package (any ecosystem) before recommending or installing it?

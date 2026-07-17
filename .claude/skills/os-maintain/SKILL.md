@@ -187,7 +187,7 @@ Insert at top of table (newest first):
 Directly create a new project repository on the Desktop. No intermediate export folder.
 Target: `~/your-projects-folder/<name>/`
 
-Use `dangerouslyDisableSandbox: true` for all Bash operations that write outside the personal-os-work directory.
+Use `dangerouslyDisableSandbox: true` for all Bash operations that write outside this repo's directory.
 
 ### Step 1: scan scope tags
 
@@ -254,7 +254,7 @@ mkdir -p "$REPO/reference"
 Use Bash cp for rules (sandbox allows writes to `.`):
 
 ```bash
-cp personal-os-work/.claude/rules/<selected>.md $REPO/.claude/rules/
+cp .claude/rules/<selected>.md $REPO/.claude/rules/
 ```
 
 Use Write tool (not cp) for skills and agents - sandbox blocks Bash cp to `.claude/` subdirs even in child paths. Read each file first, then Write with cleaned frontmatter:
@@ -369,8 +369,8 @@ Where to start:
 1. No intermediate export folder - write directly to the target repo
 2. Use Write tool for `.claude/skills/` and `.claude/agents/` - Bash cp is blocked for `.claude/` subdirs
 3. Use Bash cp (dangerouslyDisableSandbox) for rules and docs - faster for bulk file copy
-4. dangerouslyDisableSandbox required for all writes outside personal-os-work
-5. CLAUDE.md must be tailored to the actual project - not a copy of personal-os-work CLAUDE.md
+4. dangerouslyDisableSandbox required for all writes outside this repo
+5. CLAUDE.md must be tailored to the actual project - not a copy of this repo's CLAUDE.md
 6. env.example, not .env.example (hook blocks any path containing `.env`)
 
 ---

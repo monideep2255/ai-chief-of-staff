@@ -53,7 +53,7 @@ graph TB
 
 ## Metrics framework
 
-Three tiers per goal, borrowed from the personal-os-work template this repo demonstrates.
+Three tiers per goal, part of the template this repo demonstrates.
 
 | Tier | Purpose | Check frequency |
 |------|---------|----------------|
