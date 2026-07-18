@@ -16,6 +16,7 @@ depends_on:
   - EXTENSIONS.md
   - DEPENDENCIES.md
   - .claude/skills/objective-review/SKILL.md
+  - .claude/rules/anti-rationalization.md
   - .claude/scripts/verify_counts.sh
 depended_by:
   - CLAUDE.md
