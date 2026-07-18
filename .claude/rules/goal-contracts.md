@@ -11,6 +11,7 @@ depended_by:
   - DEPENDENCIES.md
   - .claude/rules/sandbox-diagnosis.md
   - .claude/rules/parallel-first.md
+  - .claude/rules/agent-first-default.md
 ---
 
 ## Goal contracts
@@ -55,7 +56,7 @@ Reward hacking is the second failure mode, and it is subtler. An agent graded on
 
 Budget or iteration caps are checkpoints, not success. When a cap is hit, the run stops and reports progress plus blockers. It does not declare done.
 
-Rigor about the wrong layer is the third failure mode, and it hides behind a verify surface that is genuinely real. A check can audit every leaf output honestly and still certify a wrong answer, because the premise that generated those outputs was never checked. A measured instance: a research run verified all twenty of its facts against two independent authoritative sources each, an honest and rigorous verify surface, and still shipped a wrong answer, because the premise that produced the fact list (the list itself, built from model memory) went unverified. The rigor was real and pointed one layer too low. When the decomposition or premise matters, the verify surface must cover it, not only the leaves. Done-when should name the premise as a checkable element, or the contract certifies a confident wrong answer with a clean audit trail. This is a failure mode worth watching for in any plan-then-execute workflow.
+Rigor about the wrong layer is the third failure mode, and it hides behind a verify surface that is genuinely real. A check can audit every leaf output honestly and still certify a wrong answer, because the premise that generated those outputs was never checked. A measured instance: a research run verified all twenty of its facts against two independent authoritative sources each, an honest and rigorous verify surface, and still shipped a wrong answer, because the premise that produced the fact list (the list itself, built from model memory) went unverified. The rigor was real and pointed one layer too low. When the decomposition or premise matters, the verify surface must cover it, not only the leaves. Done-when should name the premise as a checkable element, or the contract certifies a confident wrong answer with a clean audit trail. Source: the CMA plan-big-execute-small repo dive (`Reference-repos/CMA-plan-big-execute-small-Deep-Dive/`).
 
 ### Three-state permissions
 

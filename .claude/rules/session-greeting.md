@@ -22,7 +22,7 @@ On your **first response** in every conversation, before addressing the user's r
 
 **Daily nudges:**
 - Forge: [check Forge/logs/daily/ for today's date. If no log: "No session today. Try /forge --quick (15 min)". If done: "Done for today."]
-- Learning: [check Learning/current-focus/ for any books. Pick one and say: "Continue reading: [book name]". If no books in current-focus: "No book in active reading. Move one to Learning/current-focus/."]
+- Learning: [check Learning/1-current-focus/ for any books. Pick one and say: "Continue reading: [book name]". If no books in 1-current-focus: "No book in active reading. Move one to Learning/1-current-focus/."]
 - Exercises: [check Forge/exercises/ for this week's artifacts. If <2: "Only [N] exercise artifacts this week. Try /forge --deep for a portfolio piece."]
 ```
 

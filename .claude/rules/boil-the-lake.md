@@ -6,6 +6,7 @@ depends_on: []
 depended_by:
   - CLAUDE.md
   - .claude/README.md
+  - .claude/rules/agent-first-default.md
 ---
 
 ## Boil the lake

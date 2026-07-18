@@ -1,6 +1,6 @@
 <!-- scope: portable -->
-<!-- depends_on: [] -->
-<!-- depended_by: [CLAUDE.md] -->
+<!-- depends_on: [LLM-AI-insights/AI_PM_reference/Using_LLMs_without_letting_them_think_for_you.md] -->
+<!-- depended_by: [CLAUDE.md, .claude/rules/agent-first-default.md] -->
 
 ## Preserve your thinking
 
