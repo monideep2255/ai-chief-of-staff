@@ -22,7 +22,7 @@ The sandbox is a security boundary. `dangerouslyDisableSandbox: true` removes it
 
 | Symptom | Class | Durable fix | Override needed? |
 |---------|-------|-------------|------------------|
-| "Operation not permitted", "could not lock", write blocked to a path outside the allowlist | Filesystem deny | Write to an allowed path (scratchpad, repo dir). If a protected path legitimately must change (e.g. `.git/config`), that one write needs the override. | Only for the single protected-path write |
+| "Operation not permitted", "could not lock", write blocked to a path outside the allowlist | Filesystem deny | Write to an allowed path (scratchpad, repo dir). If a protected path legitimately must change (e.g. `.git/config`), that one write needs the override. A `git pull` whose incoming commits rewrite protected paths (e.g. `.claude/skills/`) is one named operation and takes the override for the whole pull. | Only for the single protected-path write, or a named protected-path operation such as a pull |
 | Connection refused or blocked to an `https://` host | Network Layer-7 | The proxy allows HTTPS to allowlisted hosts. Add the host with `/sandbox`. | No |
 | Connection fails to a raw TCP or SSH endpoint (e.g. `git@github.com:22`) | Network Layer-4 | The HTTP proxy cannot tunnel raw SSH regardless of allowlist. Switch the tool to HTTPS (e.g. `git remote set-url` to `https://`). | Only as a last resort if no HTTPS path exists |
 
@@ -37,6 +37,26 @@ git remote set-url origin https://github.com/<owner>/<repo>.git
 ```
 
 After that, pushes ride the already-allowlisted HTTPS path with no override. `github.com` and `api.github.com` are allowlisted for HTTPS. The `.git/config` write itself was filesystem-denied and needed the override once, which is correct: `.git/config` is protected precisely because it controls the push destination.
+
+### Worked example: git pull into protected paths
+
+`git pull` failed under the sandbox because the incoming commits rewrote files under `.claude/skills/`, which sit on the sandbox write-protection list. The fetch itself succeeded, HTTPS reached GitHub fine; only the working-tree checkout was denied ("unable to unlink old '.claude/skills/.../SKILL.md': Operation not permitted"). This is a Layer-1 filesystem deny, not a network problem, so `/sandbox` does nothing for it. A pull is a legitimate, named write to protected paths, so the durable fix is to rerun it once with the sandbox off:
+
+```bash
+git pull origin main   # dangerouslyDisableSandbox: true
+```
+
+The trap: the first sandboxed attempt does not fail cleanly. Git begins the fast-forward checkout, mutates some files, then aborts when it hits the first protected path, leaving a half-applied working tree (files deleted or modified toward the target while HEAD still points at the old commit). Do not retry the pull on top of that mess. Git refuses with "local changes would be overwritten" and "untracked files would be overwritten," because the half-applied changes now look like local edits.
+
+Recover to the last good commit first, then pull clean:
+
+```bash
+git reset --hard HEAD          # revert the half-applied tracked changes (sandbox off for protected paths)
+git clean -fd <scoped path>    # remove untracked files the abort scattered, scope to the touched dir
+git pull origin main           # clean fast-forward (sandbox off)
+```
+
+This recovery is safe only when the tree was clean before the pull, so confirm that first (`git status --short` empty at the start). `reset --hard` and `clean` discard uncommitted work, so if the pre-pull tree held real local edits, stash them instead. Before assuming the incoming "deletions" are real, read what the commits actually do (`git diff --stat <old> origin/main`): a folder reorganization shows as `rename ... (100%)`, not a delete, so nothing is lost. Prove the result the same way as a push: `git rev-parse HEAD origin/main` must match and `git status --short` must be empty.
 
 ### Prove the fix, do not assert it
 
@@ -57,7 +77,8 @@ Allow:
 - Classify a sandbox failure into one of the three classes before acting
 - Add an HTTPS host to the allowlist via `/sandbox` for a Layer-7 block
 - Apply a durable protocol switch (SSH to HTTPS) for a Layer-4 block
-- Retry once with `dangerouslyDisableSandbox` for a single, named, protected-path write that legitimately must happen (e.g. `.git/config`)
+- Retry once with `dangerouslyDisableSandbox` for a single, named, protected-path write that legitimately must happen (e.g. `.git/config`), or a named protected-path operation such as a `git pull` whose incoming commits rewrite `.claude/` files
+- Recover a half-applied pull with `git reset --hard HEAD` plus a scoped `git clean`, then re-pull, but only when the tree was verified clean before the pull
 
 Ask:
 - Before disabling the sandbox for anything broader than a single named command

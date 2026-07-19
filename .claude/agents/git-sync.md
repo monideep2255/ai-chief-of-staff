@@ -34,6 +34,8 @@ cd "/path/to/your/repo"
 git pull
 ```
 
+If the incoming commits rewrite files under `.claude/` (skills, agents, hooks, rules), the sandbox denies the working-tree write ("Operation not permitted" on a `.claude/` path). This is a Layer-1 filesystem deny, not a network issue: rerun the pull once with the sandbox off. See the git pull worked example in `.claude/rules/sandbox-diagnosis.md`.
+
 ### Push (sync to GitHub)
 ```bash
 cd "/path/to/your/repo"
@@ -100,3 +102,9 @@ If push fails:
 1. Check if there are unpulled changes → pull first
 2. Check for merge conflicts → report to user
 3. If the push is blocked by the sandbox, diagnose per `.claude/rules/sandbox-diagnosis.md` before disabling anything. An SSH remote (Layer-4) cannot tunnel the HTTPS proxy, so switch to an HTTPS remote rather than disabling the sandbox. Prove the push succeeded by comparing hashes (`git rev-parse HEAD origin/main` must match); never use `GIT_CURL_VERBOSE` or `GIT_TRACE_CURL` for handshake evidence, since `GIT_TRACE_REDACT` does not cover the HTTP/2 frame trace and the auth token leaks in cleartext
+
+If pull fails:
+
+1. Sandbox "Operation not permitted" on a `.claude/` path → Layer-1 filesystem deny, not a network issue. Rerun the pull once with the sandbox off (the incoming commits legitimately rewrite protected paths).
+2. If that first attempt already aborted mid-checkout, it leaves a half-applied tree that blocks a retry ("local changes would be overwritten"). Recover to the last good commit with `git reset --hard HEAD` and a scoped `git clean -fd <dir>`, then re-pull. Only safe when the tree was clean before the pull; verify with `git status --short` first. Full procedure in `.claude/rules/sandbox-diagnosis.md`.
+3. Check for merge conflicts → report to user.
