@@ -12,6 +12,7 @@ depended_by:
   - .claude/rules/sandbox-diagnosis.md
   - .claude/rules/parallel-first.md
   - .claude/rules/agent-first-default.md
+  - .claude/skills/bossman-mode/SKILL.md
 ---
 
 ## Goal contracts

@@ -9,6 +9,8 @@ depends_on:
   - .claude/rules/parallel-first.md
   - .claude/rules/boil-the-lake.md
   - .claude/rules/anti-rationalization.md
+  - .claude/rules/self-eval-loop.md
+  - .claude/rules/goal-contracts.md
 depended_by:
   - CLAUDE.md
   - .claude/README.md
@@ -130,6 +132,33 @@ Bossman mode runs as a team, not a solo operator. The orchestrator (main session
 5. **The integrator is conditional.** Cursor found integrators bottleneck at scale. At our scale (3-8 agents), it adds value when components must connect. Skip it when builders produce self-contained deliverables.
 6. **Thin orchestrator.** The orchestrator's job is routing, not reading. To decide which agent gets which task, read file headers and frontmatter, not full contents. Delegate full reads to the agent that needs the information. When sub-agents return results, capture a one-line summary, not the full output. The orchestrator that accumulates the least context coordinates the best.
 7. **Fresh context per agent.** Every dispatched agent starts with a clean context window. Pre-inject only what that specific agent needs (task description, relevant file paths, architectural constraints, research findings). Never pass accumulated conversation history. The agent prompt template below enforces this.
+
+### Model tiering (cost lever)
+
+Assign a model tier per role, not one model for the whole team. Keep the orchestrator thin (routing, not reading full files), so its model choice barely matters, then push the strongest model to where judgment is hard and a cheaper model to where the work is well-scoped or bulk.
+
+| Role | Model tier | Effort | Why |
+|------|-----------|--------|-----|
+| Orchestrator (main session) | User's session model | n/a | Fixed by the user. Keep it thin. |
+| Researcher / reader | Cheap or mid | low | Bulk document reading. The cost is the input, not the reasoning. |
+| Builder | Mid | medium | Well-scoped construction against a clear task. Reserve high effort for genuinely hard builds. |
+| Judge | Strongest | high or xhigh | Quality gate. A missed defect here is the most expensive, so pay for the reasoning. |
+| Sub-planner | Strongest | high | Decomposition errors cascade into every downstream builder. |
+
+Pass `model` and `effort` on each `Agent` dispatch. A tool-less coordinator that delegates heavy reading to cheap scoped workers measured 2.5x cheaper and roughly 3x faster than one frontier model doing everything, with about 84 percent of input tokens billed at the cheap worker rate (the plan-big-execute-small pattern). Delegation has a fixed setup cost, so do not shard a phase into many tiny tasks just to parallelize. Each dispatched agent should carry a task worth its overhead.
+
+### The judge produces evidence, not a verdict
+
+A judge that reports "looks good, all checks pass" without showing its work is the maker-checker failure `self-eval-loop.md` warns about: a grader that knows the rubric drifts toward approving everything. Force the judge to produce evidence, and default it to fail when evidence is absent.
+
+For every claim, the judge's report must:
+- Cite the exact `file:line` for a code finding, not "the auth module looks fine".
+- Paste the actual command output for a functional or test claim (the test line, the lint result), not "tests pass".
+- Quote the specific offending line for a security or quality finding, not "no security issues found".
+
+If the judge cannot produce evidence for a check, that check fails. "I could not verify X" is a fail, never a pass.
+
+Verify the premise, not only the leaves. The judge's default instinct is to check each artifact against its assigned task: did builder 3 produce the file it was told to. That is leaf verification, and it passes even when the decomposition itself was wrong. Add one level up: does the set of completed tasks actually satisfy the phase done-when from the goal contract? A phase where every builder succeeded at its own task but the tasks together miss the phase's stated outcome is a failed phase, not a passed one (the "rigor about the wrong layer" failure from `goal-contracts.md`).
 
 ### Team dispatch order
 
@@ -304,7 +333,7 @@ Skip this check only when every agent produces self-contained deliverables with 
 
 Once all builders report back:
 
-1. Dispatch judge agent to review ALL builder output (functional correctness, code quality, plan adherence, security)
+1. Dispatch judge agent to review ALL builder output (functional correctness, code quality, plan adherence, security). Give it the strongest model at high effort. It must produce cited evidence for every claim and verify the phase premise, not just each artifact (see "The judge produces evidence, not a verdict")
 2. Dispatch test writer agent (can run in parallel with judge if test targets are clear)
 3. Dispatch integrator agent ONLY if builders produced isolated components that need wiring
 4. If judge fails the work: triage. Minor issues = dispatch a builder fix agent. Major issues = escalate to user.
@@ -407,7 +436,7 @@ Done when all of these are true:
 
 - [ ] Activation checklist passed before entering bossman mode (plan exists, architecture agreed, phase scope clear)
 - [ ] All phase deliverables were completed
-- [ ] Judge reviewed builder output and all checks passed
+- [ ] Judge produced cited evidence for every claim, verified the phase premise (not just each artifact), and all checks passed
 - [ ] Phase checkpoint was reported with decisions log
 - [ ] Artifact wiring check passed (all generated files are referenced from the correct index)
 - [ ] Context health was monitored (DEGRADING/CRITICAL tiers handled correctly)

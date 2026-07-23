@@ -11,6 +11,7 @@ depended_by:
   - .claude/rules/parallel-first.md
   - .claude/rules/sandbox-diagnosis.md
   - .claude/rules/goal-contracts.md
+  - .claude/skills/bossman-mode/SKILL.md
 ---
 
 ## Self-eval loop
