@@ -120,6 +120,7 @@ Bossman mode runs as a team, not a solo operator. The orchestrator (main session
 | **Planner** | 0-N | Sub-planners for complex areas. Spawned by orchestrator when a phase has sub-areas that need their own task decomposition. Planning is recursive and parallel. | Read-only: Read, Grep, Glob, Bash (read commands) | When phase complexity warrants it |
 | **Builder** | 1-N | Execute independent build tasks. Write code, create files, run commands. Each builder focuses on one task until done, then reports back. Does not coordinate with other builders. | All tools, isolation: worktree when modifying shared files | Parallel dispatch after research/planning |
 | **Judge** | 1 | Single quality gate. Reviews ALL builder output: does it work (functional), is it good (code quality), does it match the plan (completeness), any security issues? Replaces separate QA + reviewer roles. Simpler is better. | Read-only: Read, Grep, Glob, Bash (test/lint commands only) | After all builders complete |
+| **Adversary** | 0-1 | Use the running artifact in hostile, unscripted ways to find what scripted checks miss. Over-reports on purpose. Files findings to a shared ledger only, never fixes, triages, or closes them. | Read-only: Read, Grep, Glob, Bash (run the artifact, not edit it) | After the judge, on any phase with a runnable artifact |
 | **Test writer** | 1 | Write tests for what was built. Unit tests, integration tests, smoke tests as appropriate for the project. | All tools | After or alongside judge |
 | **Integrator** | 0-1 | Wire independently-built components together. Handle imports, configs, entry points, shared state. Only dispatched when builders produced isolated pieces that need connecting. | All tools | Only when builders worked on separate components that must connect |
 
@@ -160,6 +161,14 @@ If the judge cannot produce evidence for a check, that check fails. "I could not
 
 Verify the premise, not only the leaves. The judge's default instinct is to check each artifact against its assigned task: did builder 3 produce the file it was told to. That is leaf verification, and it passes even when the decomposition itself was wrong. Add one level up: does the set of completed tasks actually satisfy the phase done-when from the goal contract? A phase where every builder succeeded at its own task but the tasks together miss the phase's stated outcome is a failed phase, not a passed one (the "rigor about the wrong layer" failure from `goal-contracts.md`).
 
+### The adversary attacks what the judge certifies
+
+The judge is scripted verification. It checks the artifact against the plan, the tests, and the quality rubric, so it catches the failures someone thought to specify. It is blind to the failure nobody wrote a check for. That blind spot is where a fluent wrong answer, a bad-input crash, or an odd-sequence corruption hides, and a green judge verdict does not touch it.
+
+The adversary is the unscripted half. It uses the running artifact in hostile ways the spec never imagined: malformed and boundary input, out-of-order operations, edge cases, and for a question-answering system, queries engineered to draw a confident wrong answer. It over-reports on purpose, because a false alarm is cheap and a missed defect is not. It files every finding to a shared ledger and stops there. It never fixes, triages, or closes its own findings; the judge or a fix agent triages them, and only the ledger's designated closer closes them. This is the maker-cannot-sign-off split of `self-eval-loop.md` applied to verification itself: the finder is never the closer.
+
+Run the adversary after the judge, only on a phase that produced a runnable artifact. A green judge verdict is necessary but not sufficient; the adversary is the pressure that decides whether the artifact is actually trustworthy. Source: an autonomous multi-agent build harness that pairs a scripted qa role with a separate unscripted adversary.
+
 ### Team dispatch order
 
 ```
@@ -174,6 +183,7 @@ Phase start
   ├── [all builders complete]
   │
   ├── Judge ─── single quality gate (pass/fail + details)
+  ├── Adversary (only on a runnable artifact) ─── hostile unscripted use, files to the ledger
   ├── Test writer (parallel with judge if targets are clear)
   ├── Integrator (only if components need wiring)
   │
@@ -248,6 +258,15 @@ When 3+ builder agents run in parallel (worktrees or same repo), these conventio
 - If a commit or push was already requested, auto-stage formatting-only follow-ups in the same commit or a tiny follow-up commit. No extra confirmation needed.
 - Only ask the user when changes are semantic (logic, data, behavior).
 
+### Shared-ledger coordination
+
+When parallel agents share findings, defects, or task state, they coordinate through one shared markdown ledger, not by each writing wherever they like. Without a convention, two agents writing status to the same file overwrite each other, and an agent that raised an item can quietly close it. A single-writer-per-state ledger removes both races by construction and leaves an auditable trail. An autonomous build harness runs its `DEFECTS.md` and `ADVERSARIAL_REVIEW.md` this way. Four rules:
+
+- Single writer per state: each state in the ledger has exactly one role authorized to set it. The adversary files findings, the judge or a fix agent triages, only the designated closer closes. No state has two writers.
+- Mandatory reason on judgment states: any state that reflects a judgment call (accepted, rejected, closed, disputed) carries a one-line reason. A bare status change with no reason is invalid.
+- Append-only history line per transition: every transition appends a who-what-why line to the item's history. History is never rewritten, only extended, so the trail reconstructs the full life of the item.
+- The raiser never closes: the party that raised an item is never the party that closes it. The finder reports, a different role verifies and closes. This is the same finder-is-not-closer rule the adversary follows.
+
 ### Subagent tool-scope hygiene
 
 When a sub-planner or builder is itself dispatched as an orchestrator of further sub-agents (recursive planning, a researcher that fans out to readers, a builder that supervises parallel children), the dispatched sub-orchestrator must follow the untrusted-source tier separation pattern:
@@ -289,6 +308,7 @@ Team:
 - Sub-planners: [N, or "none - phase is straightforward"]
 - Builders: [N] agents for [task list]
 - Judge: 1 agent (post-build)
+- Adversary: [1 if the phase produces a runnable artifact, or "not needed"]
 - Test writer: 1 agent (post-build)
 - Integrator: [1 if components need wiring, or "not needed"]
 
@@ -334,9 +354,10 @@ Skip this check only when every agent produces self-contained deliverables with 
 Once all builders report back:
 
 1. Dispatch judge agent to review ALL builder output (functional correctness, code quality, plan adherence, security). Give it the strongest model at high effort. It must produce cited evidence for every claim and verify the phase premise, not just each artifact (see "The judge produces evidence, not a verdict")
-2. Dispatch test writer agent (can run in parallel with judge if test targets are clear)
-3. Dispatch integrator agent ONLY if builders produced isolated components that need wiring
-4. If judge fails the work: triage. Minor issues = dispatch a builder fix agent. Major issues = escalate to user.
+2. On any phase that produced a runnable artifact, dispatch an adversary agent (see the adversary role and "The adversary attacks what the judge certifies"). It uses the running artifact in hostile, unscripted ways, over-reports on purpose, and files every finding to a shared-ledger file. It never fixes, triages, or closes its own findings; the judge or a fix agent triages them, and only the ledger's designated closer closes them.
+3. Dispatch test writer agent (can run in parallel with judge if test targets are clear)
+4. Dispatch integrator agent ONLY if builders produced isolated components that need wiring
+5. If judge fails the work or the adversary files findings: triage. Minor issues = dispatch a builder fix agent. Major issues = escalate to user.
 
 ### Step 6: phase checkpoint
 
@@ -354,6 +375,7 @@ Team activity:
 - Researchers: [N] dispatched, [summary of findings]
 - Builders: [N] dispatched, [N] succeeded, [N] needed retry
 - Judge result: [pass/fail with details]
+- Adversary findings: [N filed to ledger, or "not run - no runnable artifact"]
 - Tests written: [count and location]
 - Integration: [done/not needed]
 
@@ -437,6 +459,7 @@ Done when all of these are true:
 - [ ] Activation checklist passed before entering bossman mode (plan exists, architecture agreed, phase scope clear)
 - [ ] All phase deliverables were completed
 - [ ] Judge produced cited evidence for every claim, verified the phase premise (not just each artifact), and all checks passed
+- [ ] On any runnable-artifact phase, an adversary ran after the judge and its findings were logged to the ledger and triaged (not closed by the adversary)
 - [ ] Phase checkpoint was reported with decisions log
 - [ ] Artifact wiring check passed (all generated files are referenced from the correct index)
 - [ ] Context health was monitored (DEGRADING/CRITICAL tiers handled correctly)
