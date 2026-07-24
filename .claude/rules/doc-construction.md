@@ -96,6 +96,7 @@ Non-negotiable for every doc this rule applies to:
 - Active voice, "you" not "the user"
 - No jargon without immediate definition
 - No corporate filler ("leverage", "synergize", "robust solution", "at scale")
+- No prose walls: when a paragraph carries 3+ distinct facts or a list, break it into bullets or "Label: detail" items. See `writing-style.md`
 - Test: could a smart high schooler follow this? If not, simplify until they can
 
 If you cannot explain it simply, you do not understand it well enough yet. Go back to first principles before writing more.
@@ -118,7 +119,7 @@ Deny:
 
 ### Related rules
 
-- `writing-style.md`: prose hygiene (sentence case, no em dashes, no bold, no LLM brands)
+- `writing-style.md`: prose hygiene (sentence case, no em dashes, no bold, no LLM brands, no prose walls)
 - `clarify-before-drafting.md`: run Socratic clarification before starting a substantial draft
 - `communication-style.md`: read first-principles, socratic-questioning, objective-review skills before major interactions
 - `first-principles.md` (agent): the mental model and output format this rule borrows from

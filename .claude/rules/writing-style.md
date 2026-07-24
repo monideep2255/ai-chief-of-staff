@@ -15,6 +15,7 @@ Rules for prose hygiene in all documentation, Confluence pages, and external-fac
 
 ### Formatting
 - No em dashes, en dashes, or mid-sentence hyphens as punctuation. These are a strong AI-written signal. Instead, use transition words (additionally, next, also, specifically, in particular), commas, relative clauses ("which", "where", "who"), or restructure into separate sentences. Use colons for lists. Hyphens with spaces ( - ) are acceptable only in tables and bullet labels (e.g. "Label - description")
+- Full words in written text, not shortforms. Write "repository" not "repo", and "document" not "doc". The short forms are fine in chat, where speech is colloquial, but not in documentation, Confluence pages, or anything shared as written text.
 - **Sentence case in headings and document titles** - not title case. Capitalize only:
   - The first word of the heading
   - Proper nouns (people: Dalio, Kahneman, Priya; places: China, Suez; organizations: Stanford, NATO)
@@ -29,6 +30,18 @@ Rules for prose hygiene in all documentation, Confluence pages, and external-fac
 - After a colon, capitalize the first word if what follows is a complete sentence. Lowercase if it is a fragment or continuation.
 - No line breaks/horizontal rules between sections unless specifically needed
 - No literal `\n` or `<br/>` in Mermaid diagrams. Keep node labels short (under 30 chars) or split into separate nodes
+
+### No prose walls
+
+A prose wall is one dense paragraph that crams several distinct facts, steps, or list items into running text. It is hard to scan, hard to update, and easy to lose a fact inside. Whenever a block carries more than one thing a reader will scan for or compare, break it into structure.
+
+- 3 or more distinct facts, items, or steps in a paragraph: convert to a bullet list, one item per line.
+- Each item has a name and a detail: use the "Label: detail" bullet form (e.g. "Live: https://example.org", "Stack: Render plus Neon").
+- Several things that each carry their own facts (several apps, components, options): give each its own sub-heading with bullets under it, not one paragraph per thing.
+- One idea per bullet. Do not rebuild the wall inside a bullet by chaining clauses with commas and semicolons.
+- Keep a paragraph only when the sentences flow as one argument or narrative. Facts a reader scans, compares, or edits belong in a list.
+
+The smell test: if you are writing ", a X that does A, a Y that does B, and a Z that does C" inside a sentence, that is a list wearing a paragraph. Break it out.
 
 ### Branding and attribution
 - Never mention specific LLM vendors or products (e.g. no brand names, no CLI tool names)
@@ -60,4 +73,4 @@ Does not trigger:
 - Short inline responses or tool call annotations
 - Content inside code blocks (preserve the original formatting)
 
-The test: does my output contain any em dashes, bold text, title case headings, or LLM brand names?
+The test: does my output contain any em dashes, bold text, title case headings, LLM brand names, informal shortforms (repo, doc), or prose walls (a dense paragraph of 3+ facts that should be a list) in written text?

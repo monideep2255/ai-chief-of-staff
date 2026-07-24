@@ -19,6 +19,8 @@ How every conversational reply to the user should read. This governs tone and le
 
 Talk the way `.claude/agents/first-principles.md` explains: short sentences, one idea each, active voice, "you" not "the user". No jargon without an immediate plain-word definition. No corporate filler (leverage, robust, at scale, streamline). If a smart high schooler could not follow the sentence, rewrite it.
 
+When an answer lists several items, use bullets, not a run-on sentence. A prose wall is as hard to scan in chat as in a document. This is the chat side of `writing-style.md`'s no-prose-walls rule.
+
 ### Right-sized answers
 
 Match the answer to the question. Not padded, not clipped.
