@@ -1,7 +1,7 @@
 ---
 name: ship
 author: human
-description: Sync docs then push to GitHub. Two-step shortcut  -  runs docs-sync agent first, then git-sync agent.
+description: Sync docs, clean the working tree, then push to GitHub. Runs docs-sync first, removes stale staging folders and .DS_Store files, then runs git-sync.
 scope: portable
 user_invocable: true
 agent: true
@@ -20,7 +20,7 @@ depended_by:
 
 # /ship - sync docs + push to GitHub
 
-Run these two agents in sequence:
+Run these stages in sequence:
 
 ## Step 1: docs sync
 
@@ -33,9 +33,9 @@ Read `.claude/agents/docs-sync.md` for the full agent instructions. Key points:
 4. Make surgical edits  -  never rewrite files
 5. Report what changed
 
-## Step 2: clean .cc-writes folders
+## Step 2: clean the working tree
 
-After docs-sync, remove Claude Code's empty `.cc-writes` staging folders so they do not pile up in the working tree. Standing owner permission was granted for this step on 2026-07-15, so run it without asking.
+After docs-sync, remove two kinds of litter so they do not pile up in the working tree: Claude Code's empty `.cc-writes` staging folders, and macOS `.DS_Store` files. Standing owner permission was granted for the `.cc-writes` cleanup and the `.DS_Store` cleanup, so run this without asking.
 
 Run the cleanup script with the sandbox disabled (the `.cc-writes` paths sit on the sandbox protected list, so deletion is denied under the sandbox):
 
@@ -43,7 +43,12 @@ Run the cleanup script with the sandbox disabled (the `.cc-writes` paths sit on 
 python3 .claude/skills/ship/clean-cc-writes.py
 ```
 
-The script uses `os.rmdir`, which removes empty directories only, so it can never delete a folder that holds a real file, and the main `.claude/` is never empty so it stays protected. It also removes any spurious `.claude` parent left empty. These folders are gitignored, so this step changes nothing in the commit; it only keeps the tree clean.
+How each pass stays safe:
+
+- `.cc-writes` folders: the script uses `os.rmdir`, which removes empty directories only, so it can never delete a folder that holds a real file, and the main `.claude/` is never empty so it stays protected. It also removes any spurious `.claude` parent left empty.
+- `.DS_Store` files: `os.remove` is a real unlink, so the guard is the match instead. The basename must be exactly `.DS_Store`, and the path must be a regular file, never a directory and never a symlink. macOS regenerates these on folder access, so removing them loses nothing.
+
+Both passes skip symlinked directories, which keeps the walk out of any external repos referenced from this repo. Both kinds of file are gitignored, so this step changes nothing in the commit; it only keeps the tree clean.
 
 ## Step 3: git sync
 
@@ -60,6 +65,6 @@ Read `.claude/agents/git-sync.md` for the full agent instructions. Key points:
 ## Important
 
 - Always run docs-sync BEFORE git-sync (docs may create additional changes to commit)
-- Run the .cc-writes cleanup between docs-sync and git-sync so the tree is clean before the commit
+- Run the working-tree cleanup (.cc-writes folders and .DS_Store files) after docs-sync and before git-sync so the tree is clean before the commit
 - If docs-sync reports "no changes needed", still run the cleanup and git-sync if there are uncommitted changes
 - If nothing to commit at all, report that and stop
