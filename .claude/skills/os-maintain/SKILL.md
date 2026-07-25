@@ -288,7 +288,7 @@ Build-relevant workflow defaults (use unless user says otherwise):
 - `Prototype_first_PM_workflow.md`
 - `First_principles_system_redesign_loop.md`
 - `LLM_cli_pm_operating_system.md`
-- `Zevis_AI_development_workflow.md` (from AI_PM_reference/)
+- `Zevis_AI_development_workflow.md` (from AI_PM_reference/archive/)
 
 ### Step 6: write root files
 
