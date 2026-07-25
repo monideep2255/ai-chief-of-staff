@@ -57,7 +57,7 @@ ai-chief-of-staff/
 ├── .claude/                       # AI infrastructure (Claude Code specific)
 │   ├── agents/                    # 8 custom agents
 │   ├── skills/                    # 26 reusable skills
-│   └── rules/                     # 33 behavioral rules
+│   └── rules/                     # 34 behavioral rules
 ├── CLAUDE.md                      # Claude Code index (agents, skills, rules)
 ├── AGENTS.md                      # Universal AI context (any assistant)
 ├── GETTING_STARTED.md             # Fork-and-run walkthrough
@@ -79,7 +79,7 @@ Component counts are in the [system map](#system-map) above. Details live in sou
 |-----------|-----------------|---------------------|
 | Agents (8) | [CLAUDE.md](CLAUDE.md#sub-agents) / [AGENTS.md](AGENTS.md#sub-agents) | Magic words, purpose, trigger phrases |
 | Skills (26) | [CLAUDE.md](CLAUDE.md#skills) / [AGENTS.md](AGENTS.md#skills) | Slash commands, descriptions, output paths |
-| Rules (33) | [CLAUDE.md](CLAUDE.md#rules) | Scope, glob patterns, enforcement details |
+| Rules (34) | [CLAUDE.md](CLAUDE.md#rules) | Scope, glob patterns, enforcement details |
 | Plugins and MCP servers | [EXTENSIONS.md](EXTENSIONS.md) | Capabilities, types, what each provides |
 
 ## How the pieces connect

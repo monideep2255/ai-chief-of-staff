@@ -13,6 +13,7 @@ depended_by:
   - .claude/rules/parallel-first.md
   - .claude/rules/agent-first-default.md
   - .claude/skills/bossman-mode/SKILL.md
+  - .claude/rules/ship-clean-no-bait.md
 ---
 
 ## Goal contracts

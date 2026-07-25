@@ -44,7 +44,8 @@ This directory contains Claude Code configuration for this repository.
 │   ├── self-eval-loop.md
 │   ├── goal-contracts.md
 │   ├── sandbox-diagnosis.md
-│   └── agent-first-default.md
+│   ├── agent-first-default.md
+│   └── ship-clean-no-bait.md
 ├── agents/                            # Custom agents (auto-activated)
 │   ├── action-planner.md
 │   ├── code-reviewer.md

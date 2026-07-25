@@ -7,6 +7,7 @@ depended_by:
   - CLAUDE.md
   - .claude/README.md
   - .claude/rules/agent-first-default.md
+  - .claude/rules/ship-clean-no-bait.md
 ---
 
 ## Boil the lake

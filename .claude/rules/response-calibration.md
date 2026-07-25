@@ -9,6 +9,7 @@ depends_on:
 depended_by:
   - CLAUDE.md
   - .claude/README.md
+  - .claude/rules/ship-clean-no-bait.md
 ---
 
 ## Response calibration

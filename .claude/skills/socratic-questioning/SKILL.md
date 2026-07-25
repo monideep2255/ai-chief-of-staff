@@ -1,7 +1,7 @@
 ---
 name: socratic-questioning
 author: human
-description: Teaches Claude to use Socratic questioning method - arriving at truth through systematic questioning before providing answers. Use when the user says "help me decide", "should I", "I'm stuck", or needs help thinking through decisions.
+description: Arrives at truth through systematic questioning before providing answers. Use when the user says "help me decide", "should I", "I'm stuck", or needs help thinking through decisions.
 scope: portable
 canonical_copy: .agents/skills/socratic-questioning/SKILL.md
 depends_on: []

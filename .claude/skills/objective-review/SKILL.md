@@ -1,7 +1,7 @@
 ---
 name: objective-review
 author: human
-description: Teaches Claude to provide critical, objective feedback instead of agreement and encouragement. Use when the user asks "review this", "is this good", "am I missing something", or presents work for feedback.
+description: Provides critical, objective feedback instead of agreement and encouragement. Use when the user asks "review this", "is this good", "am I missing something", or presents work for feedback.
 scope: portable
 canonical_copy: .agents/skills/objective-review/SKILL.md
 depends_on: []

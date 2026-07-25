@@ -151,10 +151,14 @@ Build a staleness list using git history and session logs. This is mechanical - 
 
 ```bash
 # Skills not touched in git history in 30+ days
-git log --since="30 days ago" --name-only -- .claude/skills/ | grep SKILL.md | sort -u
+# --format= suppresses commit messages, which otherwise mention SKILL.md paths
+# and get picked up as if they were changed files
+git log --since="30 days ago" --format= --name-only -- .claude/skills/ | grep 'SKILL\.md' | sort -u
 
 # Skills with author: agent (GC-eligible, review separately from human-authored)
-grep -l "author: agent" .claude/skills/*/SKILL.md 2>/dev/null
+# ^ anchors to the frontmatter key; without it this matches the prose in this
+# very file and always reports system-retro as agent-authored
+grep -l "^author: agent" .claude/skills/*/SKILL.md 2>/dev/null
 ```
 
 Classify each skill into one of three buckets before proceeding:
