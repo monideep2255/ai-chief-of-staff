@@ -53,6 +53,8 @@ The strongest constraint is removing the ability, not asking the agent not to us
 
 When a tool output exceeds a useful size, write to disk and return a pointer (file path + line count + first N lines). Prevents silent truncation where the LLM hallucinates the rest.
 
+When a pointer isn't practical and the output must be truncated inline, default to middle-elision: keep the head and the tail, drop the middle. An oversized result is usually a setup at the start and a conclusion or final state at the end, both of which end-truncation throws away. Reserve plain end-truncation for output that is genuinely append-only with no meaningful tail, like a live log stream.
+
 ### 5. The description is a routing contract, not a summary
 
 A skill or subagent description is the only thing the agent sees before deciding whether to load it. If a component misfires, the description is wrong far more often than the body is. Write it as three parts: what the component does, when to use it (the literal trigger phrases a user would say), and a differentiator versus related components so routing does not collide.
