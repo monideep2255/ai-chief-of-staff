@@ -60,6 +60,10 @@ Score abstain by whether a correct source existed, not by whether an answer appe
 
 Why this matters: a metric that cannot tell "safely declined" from "confidently lied" measures accuracy, not safety. Two runs can both show 80% pass while one safely refused the remaining 20% and the other fabricated it. This is the measurement half of the cite-or-refuse grounding gate in `.claude/rules/atlas-production-standards.md`. That rule says refuse when there is no source; this bucket scores whether the refusal happened and was rewarded. The trap is real: a harness that scores refusals as wrong answers will invert its own safety verdict until the bucketing is fixed.
 
+### No-silent-loss truncation (for pipelines that offload or truncate large output)
+
+Score a silent truncation as fail, not pass, even when the visible slice of the answer looks correct. If a retrieval-and-answer pipeline cannot retain the full output (context window pressure, a result set too large to inject), it must fail explicitly or return a pointer plus preview, never a truncated result presented as complete. Add a test case that forces this path (an oversized retrieval set or a long tool result) and assert the pipeline either returns the explicit-fail signal or the pointer-plus-preview shape, not a quietly clipped answer. This mirrors the no-silent-loss truncation principle in `.claude/rules/system-design-patterns.md` pattern 4.
+
 ## Acceptance criteria template
 
 Use this template for each bot:

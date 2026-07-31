@@ -181,6 +181,7 @@ For skills flagged in Phase 1:
 For all skills (not filtered):
 - **Orphaned dependencies:** Run `bash .claude/scripts/validate_skill_rules.sh` to check that `depends_on` paths still exist and skills reference the rules they should (Atlas skills reference atlas-production-standards, doc-producing skills reference doc-construction, 4+ step skills have exit checklists)
 - **Rule conflicts:** Scan all rules for contradicting guidance. Two rules that give opposite instructions for the same trigger are a conflict. Common areas: permission states (one rule allows what another denies), scope overlap (two rules claim the same glob pattern with different behavior)
+- **Description routing quality:** For each `SKILL.md`, check the `description` against `system-design-patterns.md` pattern 5 (routing contract, not a summary): does it name what the skill does, the literal trigger phrases a user would say, and a differentiator versus related skills, without spelling out the steps? A description that summarizes the workflow lets the agent skip loading the body and run a degraded version. Flag any skill whose description fails this test as a tier-B fix (clear-content, apply with a note).
 
 #### Workflows audit (Reference/Agent_workflows/)
 - **Coverage:** What common task patterns don't have a workflow?
