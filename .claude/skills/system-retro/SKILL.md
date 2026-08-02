@@ -142,6 +142,26 @@ Run through each area systematically. For each, ask these diagnostic questions:
 - **Clarity:** Are any rules ambiguous enough that they could be interpreted two ways?
 - **Completeness:** Are there patterns in how the user corrects Claude that should be rules but aren't?
 - **Categorization:** Does each rule's frontmatter scope (alwaysApply vs globs) match how it is documented? Two checks. First, frontmatter integrity: flag any rule that declares both `alwaysApply: true` and a `globs:` field, which is contradictory (book-inventory-check did this on June 22; it must pick one). Build the ground truth: a rule with a `globs:` field is glob-scoped, otherwise it is always-on. Second, doc accuracy: the SYSTEM_OVERVIEW always-on and glob-scoped tables must list exactly those rules, with the split counts matching. The os-maintain count script does not check this (it checks totals, not the always-on/glob split), so it is a retro responsibility. Apply the fix as a trivial fix unless a rule's intended scope is genuinely ambiguous.
+- **Context load:** How heavy is the always-on set? Categorization checks that each rule's scope is documented correctly; this checks what that scope costs. An always-on rule is re-sent on every turn of every session, so its cost is recurring, not one-time (see pattern 6 in `system-design-patterns.md`). Measure it, do not estimate it:
+
+```bash
+# Always-on vs glob-scoped line totals across the rule set
+always=0; globbed=0
+for f in .claude/rules/*.md; do
+  n=$(wc -l < "$f")
+  if grep -q "^globs:" "$f"; then globbed=$((globbed+n)); else always=$((always+n)); fi
+done
+echo "always-on: $always lines, glob-scoped: $globbed lines"
+
+# Largest always-on rules first, the ones worth scoping or trimming
+for f in .claude/rules/*.md; do
+  grep -q "^globs:" "$f" || echo "$(wc -l < "$f") $f"
+done | sort -rn | head -10
+
+wc -l CLAUDE.md   # the project instruction file rides along on every turn too
+```
+
+Then judge the number, do not just record it. Two questions. First, does every always-on rule genuinely apply to every turn, or is one of the top-ten heaviest a candidate for a `globs:` scope? Second, is `CLAUDE.md` drifting long? Under roughly 200 lines is healthy; past that, push detail down into rules or skills that load conditionally. Record the always-on total each cycle so the trend is visible, and flag growth over about 15 percent since the last retro as a trim candidate.
 
 #### Skills audit
 
