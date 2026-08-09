@@ -42,11 +42,11 @@ Not for: a status update the user reads themselves (just tell them), meeting not
 ## Procedure
 
 1. If a project config exists (CLAUDE.md / AGENTS.md), read it first. Do not restate anything already in it; the handoff is session-specific only.
-2. If a prior handoff file exists, read it and update rather than starting over.
+2. Check for an existing `HANDOFF.md` at the root of the project the work belongs to. If one exists, read it and fold its still-true state forward rather than starting over (see core principle 7).
 3. If the user passed a focus for the next session, tailor the handoff toward that goal.
 4. Fill every section of the template. Mark a genuinely empty section `None`.
 5. Output the filled template inside one fenced code block in the chat.
-6. Save the same content to the file path below and tell the user the absolute path.
+6. Write the same content to `HANDOFF.md` at that project's root, overwriting any existing one, and tell the user the absolute path.
 
 ## Output format
 
@@ -97,10 +97,9 @@ Before responding, read every file listed under "Relevant files and pointers" ab
 
 ## File output
 
-Save the handoff outside the working tree so it does not pollute the repo, unless the user wants an in-repo record.
+Always write to `HANDOFF.md` at the root of the project the work belongs to. No scratchpad, no temp file, no per-session filename. There is exactly one handoff file per project, and each new handoff overwrites it, folding forward any still-true state per core principle 7. Scratchpad or temp-directory copies are session-scoped storage that outlives the session pointlessly and fragments the handoff chain across paths a later session cannot find; the single in-repo file is the durable, discoverable record.
 
-- Default: the session scratchpad directory, named `handoff-<short-title>.md`.
-- If the user prefers an in-repo record: `HANDOFF.md` in the project root.
+If the work spans a repo that is itself nested inside another (for example a sub-project vendored or gitignored inside a parent repo), write `HANDOFF.md` at the sub-project's own root, not the parent's, since that is the root a fresh agent opening that sub-project will look in first.
 
 After saving, report the absolute path. The user starts a fresh session with: "Read <path> to get context, then wait for instructions."
 
@@ -108,12 +107,13 @@ After saving, report the absolute path. The user starts a fresh session with: "R
 
 Allow:
 - Read project config, prior handoffs, and the files needed to describe current state
-- Write the handoff to the scratchpad and report its path
+- Write or overwrite `HANDOFF.md` at the project root without asking, and report its path
 
 Ask:
-- Before saving `HANDOFF.md` into the repo root (in-repo record is the user's call)
+- Nothing specific to this skill
 
 Deny:
+- Never write the handoff to a scratchpad, temp directory, or any path other than the project's `HANDOFF.md`
 - Never include secret values; reference where they live instead
 - Never write instructions in place of state ("implement X next" is banned; "X is not started" is correct)
 - Never paste content already captured in another artifact; link to it
