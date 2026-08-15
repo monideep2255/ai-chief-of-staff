@@ -126,7 +126,9 @@ Read each file and classify into the correct destination:
 | Content type | Destination |
 |-------------|-------------|
 | Workflow (has JSON schema, `"steps"`, `"actors"`, quick steps) | `Reference/Agent_workflows/` |
-| AI PM reference (deep-dive summary, product/strategy/technical) | `Reference/AI_PM_reference/` |
+| AI PM practice (PM craft, discovery, judgment, working with agents as a PM) | `Reference/AI_PM_reference/` |
+| Agent engineering (harnesses, loops, skills, multi-agent patterns, context cost) | `Reference/Agent_engineering/` |
+| AI industry and strategy (moats, market structure, national policy, org adoption) | `Reference/AI_industry_and_strategy/` |
 | Business/finance (company analysis, macro, investing, valuation) | `Reference/Business_and_finance/` |
 | Career advancement (visibility, politics, influence, career growth) | `Reference/Career_advancement/` |
 | Interview prep (hiring criteria, interview frameworks, job search) | `Reference/AI PM interview preparation/` |
@@ -143,7 +145,7 @@ Read each file and classify into the correct destination:
 **Inbox subdirectories as routing hints:**
 
 - Files in `YouTube_sourced_workflows_inbox/<project-name>/` go to `Projects/<project-name>/Reference/new-intake/`
-- Files in `YouTube_sourced_workflows_inbox/improve personal-os/` go to `Reference/AI_PM_reference/` AND trigger Step 3 (apply OS learnings immediately)
+- Files in `YouTube_sourced_workflows_inbox/improve personal-os/` go to `Reference/Agent_engineering/` (or `AI_PM_reference/` when the doc is about PM craft rather than how agents are built) AND trigger Step 3 (apply OS learnings immediately)
 - Files in the inbox root go to the appropriate `Reference/` subfolder
 
 Rename each file to sentence case with underscores per `.claude/rules/file-naming.md`. Write cleaned content to the destination. Verify: grep for em dashes and brand names in new files (should find 0).
@@ -181,7 +183,7 @@ Skip this step entirely for docs from other inbox subdirectories (Atlas, root-le
 
 Some library folders have a PLAYBOOK.md, a navigation layer that maps every doc in the folder to a decision tree, a one-sticky-note cheat sheet, and (depending on the folder) a use-case table or a curated reading sequence. A playbook only goes stale when a doc is added without updating it, so the update happens here, in the same run that placed the doc, never as a separate pass to remember later.
 
-The rule is generic, not a fixed list. For every doc you placed in Step 2, check its destination folder for a `PLAYBOOK.md`. If one exists, update it. If the folder has no playbook, skip it (its README table is the navigation). As of June 2026 the folders with playbooks are `AI_PM_reference`, `Career_advancement`, and `AI PM interview preparation`, but do not rely on that list. Check for the file.
+The rule is generic, not a fixed list. For every doc you placed in Step 2, check its destination folder for a `PLAYBOOK.md`. If one exists, update it. If the folder has no playbook, skip it (its README table is the navigation). As of August 2026 the folders with playbooks are `AI_PM_reference`, `Agent_engineering`, `AI_industry_and_strategy`, `Career_advancement`, and `AI PM interview preparation`, but do not rely on that list. Check for the file.
 
 For each new doc whose folder has a playbook, update the parts that playbook actually has. The playbooks are not structurally identical: every one has a decision tree and a cheat sheet, but the rest varies. Check the section headings before editing.
 
