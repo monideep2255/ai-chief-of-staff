@@ -1,7 +1,7 @@
 ---
 name: book-builder-hard-skills
 author: human
-description: Generate a chapter-by-chapter learning book on any technical topic, written in first-principles style with progressive complexity and Mermaid diagrams. Output path: Learning/hard-skills/<topic>/.
+description: Generate a chapter-by-chapter learning book on a technical topic, in first-principles style with progressive complexity and Mermaid diagrams. Output path: Learning/hard-skills/<topic>/. Use when the user says: /book-builder-hard-skills, "write me a book on <technical topic>", "teach me <technology> properly", "I want to learn <technical subject> deeply". Differs from book-builder-soft-skills, which covers people and communication topics, and from book-builder-from-sources, which synthesizes existing local files instead of generating from scratch. The book-inventory-check gate runs first.
 scope: portable
 argument-hint: <topic>
 depends_on:

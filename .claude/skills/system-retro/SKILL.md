@@ -18,6 +18,7 @@ depends_on:
   - .claude/skills/objective-review/SKILL.md
   - .claude/rules/anti-rationalization.md
   - .claude/scripts/verify_counts.sh
+  - .claude/scripts/test_verify_membership.py
 depended_by:
   - CLAUDE.md
   - AGENTS.md
@@ -60,6 +61,7 @@ A self-improvement loop for the personal OS. The system audits itself, finds its
 | Growth system | `GROWTH_SYSTEM.md` | Pillar health expectations |
 | Last retro | `Forge/logs/system-retro/` | Most recent retro report for comparison |
 | Validation script | `.claude/scripts/validate_skill_rules.sh` | Run during skills audit |
+| Guard self-test | `.claude/scripts/test_verify_membership.py` | Run during skills audit; proves the membership guard can still fail |
 | Count script | `.claude/scripts/verify_counts.sh` | Run during documentation audit (count verification) |
 | Skill memory | `.claude/skills/system-retro/memory.md` | Lessons from past retros |
 
@@ -200,6 +202,7 @@ For skills flagged in Phase 1:
 
 For all skills (not filtered):
 - **Orphaned dependencies:** Run `bash .claude/scripts/validate_skill_rules.sh` to check that `depends_on` paths still exist and skills reference the rules they should (Atlas skills reference atlas-production-standards, doc-producing skills reference doc-construction, 4+ step skills have exit checklists)
+- **Guard honesty:** Run `python3 .claude/scripts/test_verify_membership.py`. This is not a duplicate of the membership guard itself, it is the check on that guard. It copies the component tree to a scratch directory, plants a defect of each class there, and asserts the guard catches each one, so a green `verify_membership.py` means the guard looked and found nothing rather than never having looked. A guard can ship with a dead class that reports zero broken edges because it executes zero comparisons, and the exit code stays clean either way. Treat any FAIL or INCONCLUSIVE line as a critical finding and fix the guard before trusting anything else it reported this cycle. An inconclusive case is not a pass: it means the test found no suitable target to plant and therefore proved nothing.
 - **Rule conflicts:** Scan all rules for contradicting guidance. Two rules that give opposite instructions for the same trigger are a conflict. Common areas: permission states (one rule allows what another denies), scope overlap (two rules claim the same glob pattern with different behavior)
 - **Description routing quality:** For each `SKILL.md`, check the `description` against `system-design-patterns.md` pattern 5 (routing contract, not a summary): does it name what the skill does, the literal trigger phrases a user would say, and a differentiator versus related skills, without spelling out the steps? A description that summarizes the workflow lets the agent skip loading the body and run a degraded version. Flag any skill whose description fails this test as a tier-B fix (clear-content, apply with a note).
 

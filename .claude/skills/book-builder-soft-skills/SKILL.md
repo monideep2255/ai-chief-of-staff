@@ -1,7 +1,7 @@
 ---
 name: book-builder-soft-skills
 author: human
-description: Generate a practice-oriented soft skills book with frameworks, scripts, scenarios, and self-assessments. Output path: Learning/soft-skills/<topic>/.
+description: Generate a practice-oriented soft skills book with frameworks, scripts, scenarios, and self-assessments. Output path: Learning/soft-skills/<topic>/. Use when the user says: /book-builder-soft-skills, "write me a book on <people topic>", "help me get better at negotiation or influence or executive presence", "I need practice scripts for <situation>". Differs from book-builder-hard-skills, which covers technical topics, and from the board skill, which coaches one live situation rather than producing a reusable book. The book-inventory-check gate runs first.
 scope: portable
 argument-hint: <topic>
 depends_on:

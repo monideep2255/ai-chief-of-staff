@@ -1,7 +1,7 @@
 ---
 name: ship
 author: human
-description: Sync docs, clean the working tree, then push to GitHub. Runs docs-sync first, removes stale staging folders and .DS_Store files, then runs git-sync.
+description: "Sync documentation, clean the working tree, and push the repository to GitHub. Use when the user says: /ship, \"ship it\", \"push this\", \"commit and push\", \"sync to GitHub\", \"we are done, ship\". This is the path for work and content changes. When an OS system component changed (a rule, skill, agent, hook, or config), run /os-maintain first, then this."
 scope: portable
 user_invocable: true
 agent: true

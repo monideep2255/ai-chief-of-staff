@@ -1,6 +1,6 @@
 ---
 name: cs-research
-description: Fetch and analyze the latest high-impact computer science papers from arXiv, focusing on AI/ML/NLP with market potential.
+description: Fetch and analyze high-impact computer science papers from arXiv, focusing on AI, ML, and NLP with market potential. Use when the user says: /cs-research, "latest AI papers", "what is new on arXiv", "recent research on <ML topic>", "any good agent papers this week". Differs from biomedical-research, which pulls clinical literature from PubMed, and from web-research, which searches the open web rather than a curated paper index.
 scope: project
 author: human
 depended_by:
