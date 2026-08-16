@@ -100,7 +100,7 @@ Behavioral rules are in `.claude/rules/` with glob-based conditional loading:
 | `book-inventory-check` | `Learning/**` | Show book inventory before generating new books |
 | `pdf-docx-conversion` | `**/*.pdf`, `**/*.docx` | Ask before converting PDFs/DOCX, verify content preservation |
 | `dependency-tracking` | Always | Every component declares `depends_on` and `depended_by` in frontmatter |
-| `pause-before-acting` | Always | Before executing, check if rules apply and if clarification is needed first |
+| `pause-before-acting` | Always | Before executing, check if rules apply and if clarification is needed first. When two instruction sources conflict, settle it by the numbered precedence table and name which source won |
 | `system-design-patterns` | `.claude/agents/**`, `.claude/rules/**`, `.claude/skills/**` | Three-state permissions, snapshot before mutate, specialize by tool access, output truncation |
 | `attack-the-constraint` | Always | Identify the bottleneck before optimizing: is it time, skill, clarity, access, or tooling? |
 | `decision-logging` | Always | Log non-trivial decisions to DECISIONS.md when choosing between alternatives that affect future work |
@@ -118,7 +118,7 @@ Behavioral rules are in `.claude/rules/` with glob-based conditional loading:
 | `anti-rationalization` | Always | Block the model from rationalizing away steps in multi-step skills |
 | `memory-provenance` | Always | Tag source quality on memories so future sessions weight conflicting memories correctly |
 | `self-eval-loop` | Always | For substantial output, a first agent produces and a second grades with fresh context against pass/fail criteria |
-| `goal-contracts` | Always | Before any autonomous or multi-step run, write a contract: done-when, verify, output, constraints, blocked-stop |
+| `goal-contracts` | Always | Before any autonomous or multi-step run, write a contract: done-when, verify, output, constraints, blocked-stop, with at least one verify signal the run does not produce itself |
 | `sandbox-diagnosis` | Always | Before disabling the sandbox for a failed command, classify the failure and apply the durable fix instead |
 | `agent-first-default` | Always | Default to agent-first-draft on reversible tasks, stay hands-on on irreversible ones |
 | `ship-clean-no-bait` | Always | Once work is declared done it must be done and clean: no trickling new findings after done, no rage-bait or click-bait closers |

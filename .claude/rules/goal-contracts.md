@@ -39,7 +39,7 @@ This rule names the contract. The loop does not start until the contract exists.
 Write these before the first action, not after:
 
 1. Done when: the outcome in one testable sentence. Not "improve the docs" but "every new file has 5/5 frontmatter fields and 0 em dashes".
-2. Verify: the concrete surface that proves it, a grep, a test, a file count, a second-agent grade. If you cannot name how you would check it, the goal is not yet a contract. The verify surface is immutable for the duration of the run: you may add checks, never weaken them.
+2. Verify: the concrete surface that proves it, a grep, a test, a file count, a second-agent grade. If you cannot name how you would check it, the goal is not yet a contract. The verify surface is immutable for the duration of the run: you may add checks, never weaken them. At least one signal must be observable state the run does not itself produce: a row count in the source data, a remote hash, a file written by another process, a second agent's independent read. A surface built entirely from checks over the run's own output can be satisfied by producing more output, which is why the run must be graded against something it does not control.
 3. Output: what artifact the run produces and where it lands (file path, table, commit).
 4. Constraints: what must stay true throughout (no deletions without asking, no secrets in logs, style rules hold).
 5. Blocked-stop: the condition under which you stop and report rather than guess. A blocked stop is a valid, honest end state, not a failure to hide.
@@ -74,5 +74,6 @@ Deny:
 - Never mark a multi-step task complete on feel, with no evidence from the verify surface
 - Never change, weaken, delete, narrow, or skip the verify surface (tests, assertions, eval cases, count thresholds) to reach done-when. Changing the check so the check passes is a failed run
 - Never treat a leaf-level verify surface as complete when the premise or decomposition that generated the leaves is itself unverified. The premise is part of the verify surface
+- Never build a verify surface entirely out of checks over the run's own output. At least one signal comes from state the run does not produce
 
-The test: before I started running to completion, did I write a testable done-when and name how I would verify it?
+The test: before I started running to completion, did I write a testable done-when, name how I would verify it, and include at least one signal the run does not produce itself?

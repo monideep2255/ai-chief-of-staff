@@ -96,7 +96,7 @@ This repo ships 34 rules. The full table, with exact scope and what each one enf
 
 Three rules are worth naming here because they shape how every other rule behaves rather than governing one specific task:
 
-- `pause-before-acting`, which is the rule that makes the other 32 actually get checked. Before the agent's first tool call, it stops and asks whether any rule applies to the file type or task at hand.
+- `pause-before-acting`, which is the rule that makes the other 32 actually get checked. Before the agent's first tool call, it stops and asks whether any rule applies to the file type or task at hand. It also carries the numbered precedence table that settles a conflict between two instruction sources by rank rather than in the moment, and requires the agent to name which source won.
 - `system-design-patterns`, which governs how new rules, skills, and agents get written in the first place: three-state permissions, snapshot before mutate, specialize by tool access, and the description-as-routing-contract principle covered under skills below.
 - `dependency-tracking`, which requires every rule, skill, and agent to declare `depends_on` and `depended_by` in its own frontmatter, and requires `DEPENDENCIES.md` to hold the folder-level and cross-component map that survives a file being deleted.
 
