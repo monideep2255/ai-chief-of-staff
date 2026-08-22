@@ -106,6 +106,7 @@ Behavioral rules are in `.claude/rules/` with glob-based conditional loading:
 | `decision-logging` | Always | Log non-trivial decisions to DECISIONS.md when choosing between alternatives that affect future work |
 | `os-improvement-logging` | Always | Log every adopted system improvement to OS_IMPROVEMENTS.md |
 | `parallel-first` | Always | Before multi-part tasks, check if subtasks are independent and can run in parallel; verify every dispatched agent produced its expected output |
+| `plan-then-fan-out` | Always | For fan-out work, the reasoning model scouts and decomposes into non-overlapping task contracts before dispatch; cheaper execution models run each bounded piece in parallel |
 | `npm-security-check` | `**/package.json`, `**/requirements*.txt`, `**/.mcp.json` | Before installing or recommending any package, run supply chain security checks |
 | `preserve-your-thinking` | Always | Claude is the sparring partner, not the answer machine. Ask what you think first; stress-test your position |
 | `clarify-before-drafting` | Always | Run clarification before writing any substantial document (3+ sections, external review) |

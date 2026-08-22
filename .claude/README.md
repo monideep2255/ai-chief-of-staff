@@ -30,6 +30,7 @@ This directory contains Claude Code configuration for this repository.
 │   ├── decision-logging.md
 │   ├── os-improvement-logging.md
 │   ├── parallel-first.md
+│   ├── plan-then-fan-out.md
 │   ├── npm-security-check.md
 │   ├── preserve-your-thinking.md
 │   ├── clarify-before-drafting.md

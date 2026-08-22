@@ -11,6 +11,10 @@ depended_by:
   - .claude/README.md
   - .claude/rules/self-eval-loop.md
   - .claude/rules/goal-contracts.md
+  - .claude/rules/plan-then-fan-out.md
+  - .claude/skills/bossman-mode/SKILL.md
+  - .claude/skills/ingest-workflows/SKILL.md
+  - .claude/skills/system-retro/SKILL.md
 ---
 
 ## Parallel-first execution
@@ -41,6 +45,17 @@ When dispatching parallel subagents, each agent should start with a clean contex
 
 When the input itself is large (long logs, a big result set, a folder of documents), do not stuff it into one prompt. Give the agent tools to treat context as external state it navigates on demand: grep to locate, read a slice, partition the work, recurse if needed. A subagent handed a pointer plus the means to query beats one handed a giant pre-loaded blob. This matters most for long-running research and search agents whose result sets grow fast.
 
+**Context economy (what comes back matters more than what goes out):**
+
+Isolation controls what a subagent receives. This controls what it returns, and what any tool call pulls in. Measured on this repository's own transcripts across 147 sessions, content entering context is the single largest cost centre, because every token written once is then re-read on every subsequent turn. A token entering at turn 100 of a 600-turn session costs roughly 51 times its face value. So the question on every tool call and every dispatch is not "can I afford to read this once" but "can I afford to re-read this for the rest of the session".
+
+- Bounded subagent returns. A dispatched agent writes its full output to a named file and returns a short summary plus that path, not a transcript. Target the return at roughly 300 words. The planner reads the file only when it actually needs the detail, which is often never. Nothing is lost, only relocated, and the detail is one read away instead of permanently resident.
+- Grep before you read. On any file over roughly 500 lines, locate first and read the slice, using offset and limit. Read the whole file only when you genuinely need the whole file.
+- Large tool output goes to a pointer. This is `system-design-patterns` pattern 4, and it applies to the output you consume (Read, Bash, Grep), not only to tools you author. Above roughly 500 lines or 20 KB, write to disk and keep the path plus a preview. Pattern 4's explicit-fail clause holds: if the full output cannot be retained, fail loudly rather than return a truncated result as if it were complete.
+- Do not re-read to confirm. A file you just edited does not need reading back; the edit would have errored. Re-reading for reassurance pays the entry cost twice.
+
+The economics, so the trade-off is a decision rather than a habit: this is a cost lever, never a correctness lever. When the detail genuinely changes the answer, pull it in and pay for it.
+
 **Verify the dispatch completed (before you declare done):**
 
 Dispatched agents fail quietly. An agent stops after writing the first of two files, a workflow returns 0 agents from a bad argument, a run truncates an artifact mid-way. The loop reports success anyway, because nothing checked. Close that gap:
@@ -63,3 +78,5 @@ This is a completeness check (did all the artifacts get produced?), not a qualit
 When one agent writes substantial output, dispatching a second fresh-context agent to grade it is the produce-then-grade pattern. That pattern is owned by `self-eval-loop.md` (when to apply, context isolation, three-state permissions). Use it there. Parallel-first's only addition: the grading agent is independent work, so it can be dispatched in parallel with other review dimensions.
 
 The test: are any of my sequential tool calls actually independent, and when I dispatched agents to produce artifacts, did I verify every expected output exists and is non-empty before declaring the dispatch done?
+
+The context-economy test: did anything enter context this turn that I will be re-reading for the rest of the session and did not need, a full file where a slice would do, a full agent transcript where a summary and a path would do, or a re-read of something I just wrote?

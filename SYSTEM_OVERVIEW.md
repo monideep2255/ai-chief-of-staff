@@ -53,7 +53,7 @@ ai-chief-of-staff/
 ├── .claude/
 │   ├── agents/                    # 8 custom agents
 │   ├── skills/                    # 26 reusable skills
-│   └── rules/                     # 34 behavioral rules
+│   └── rules/                     # 35 behavioral rules
 ├── README.md
 ├── CLAUDE.md
 ├── AGENTS.md
@@ -92,7 +92,7 @@ globs: ["Work/example-project/**"]   # omit when alwaysApply is true
 
 Almost every rule in this repo follows a three-state permission pattern inside its body: allow (the agent does this freely), deny (the agent never does this on its own), and ask (the agent pauses and confirms first). Writing a rule without sorting its actions into these three buckets leaves it ambiguous about what it actually governs, which is why `.claude/rules/system-design-patterns.md` calls this out as a required pattern for any new rule.
 
-This repo ships 34 rules. The full table, with exact scope and what each one enforces, lives in [CLAUDE.md](CLAUDE.md#rules). That table is the source of truth. Treat this section as the explanation of the mechanism, not a second copy of the list, so the two never drift apart.
+This repo ships 35 rules. The full table, with exact scope and what each one enforces, lives in [CLAUDE.md](CLAUDE.md#rules). That table is the source of truth. Treat this section as the explanation of the mechanism, not a second copy of the list, so the two never drift apart.
 
 Three rules are worth naming here because they shape how every other rule behaves rather than governing one specific task:
 
