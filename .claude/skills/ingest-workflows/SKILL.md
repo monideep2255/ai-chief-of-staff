@@ -13,6 +13,8 @@ depends_on:
   - .claude/rules/pdf-docx-conversion.md
   - .claude/rules/anti-rationalization.md
   - .claude/rules/system-design-patterns.md
+  - .claude/rules/parallel-first.md
+  - .claude/rules/plan-then-fan-out.md
   - .claude/skills/ship/SKILL.md
   - .claude/skills/wiki-lint/SKILL.md
   - .claude/skills/os-maintain/SKILL.md
@@ -54,6 +56,66 @@ Before processing, verify:
 
 If the inbox is empty, report "Inbox is empty. Nothing to process." and stop.
 
+## Parallel execution and token economy
+
+Ingesting is file-by-file work, so most runs are the exact case fan-out exists for. This section is not optional, and it sits here, before Step 0, on purpose: a rule read only after the steps are underway gets skipped by habit, not by decision. The full doctrine lives in `.claude/rules/parallel-first.md` and `.claude/rules/plan-then-fan-out.md`. This section applies it to the inbox pipeline. Do not invent a different discipline for this skill.
+
+### The dispatch gate
+
+Run these three checks before any file work begins, per `.claude/rules/parallel-first.md`:
+
+1. Does any subtask consume another subtask's output? If yes, those two are sequential.
+2. Do two subtasks write the same file? If yes, those two are sequential.
+3. Everything else runs in parallel.
+
+Steps 1 and 2 applied to independent inbox files almost always clear check 3. One file's conversion, cleaning, classification, and placement have no cross-file dependency and write to a different destination file each time.
+
+### Orchestrator and worker roles
+
+Per `.claude/rules/plan-then-fan-out.md`, the orchestrating model scouts the inbox tree and the destination folders first: list every file, note its subdirectory routing hint, check which destination folders already exist. It then decomposes the work into non-overlapping batches and writes each worker a contract (see below). Workers run on the cheaper execution tier, Sonnet by default, Haiku only for purely mechanical work such as a grep-and-list pass over the inbox. The orchestrator keeps the classification judgment calls, the tier-C recommendations from Step 5, and the final synthesis across all batches. Never fan out blind. A worker dispatched without a scouted, decomposed batch is a bet, not a plan.
+
+### Partition by destination folder
+
+Batch files by destination folder so no two workers ever write into the same file. Name the batches explicitly before dispatch, one line per batch: which files, which destination folder, which worker. Two workers may write into the same folder only when their exact output filenames are fixed in advance by the orchestrator, so the two writes still never collide.
+
+### The worker contract
+
+Every dispatched worker prompt must carry all of the following:
+
+- The exact source file paths the worker owns.
+- The exact destination folder, and, where the orchestrator has already decided it, the exact output filename.
+- The full frontmatter schema from Step 2 (description, type, source, added, actionability).
+- The writing-style constraints: no em dashes, sentence case headings, no bold, full words instead of shortforms, brand neutralization per `.claude/rules/writing-style.md`.
+- The doc-construction requirements: table of contents, first-principles structure, an enumerated known-gaps section that separates not-tested from tested-and-negative.
+- An explicit pages range for any PDF over 10 pages, because the file reader errors on longer ones without one.
+- A prohibition on writing any private inbox or webmail URL into an output file. The substitute is the `Source:` attribution line from Step 2, never a raw inbox or mailbox link.
+- An instruction not to delete any source file. Deletion is handled centrally by the orchestrator under the standing authorization in `.claude/rules/file-protection.md`, not by individual workers.
+- A bounded return, per the context economy rules below.
+
+### Context economy
+
+Per `.claude/rules/parallel-first.md`, a worker writes its full output to its destination file and returns roughly 150 to 300 words: the paths it wrote, plus anything the orchestrator must decide. A worker never returns document content or a transcript. The reason: a token that enters the orchestrator's context is re-read on every later turn of the run, so a worker that pastes its output back turns a cheap fan-out expensive after the fact.
+
+Two more habits carry over from the same rule. Grep before you read on any file over roughly 500 lines, and read only the slice you need. Never re-read a file you just wrote, the write would have errored if it had failed.
+
+### Context isolation
+
+Each worker starts clean. It receives only its own task, its own file paths, and its own constraints. Never pass conversation history, another worker's result, or an accumulated summary into a worker prompt. A worker that reads its own inbox files fresh produces a cleaner result than one handed a summary of what a sibling worker found.
+
+### Dispatch verification
+
+Before declaring a batch of workers done, run this three-step procedure:
+
+1. Enumerate the expected output files before dispatch. A fan-out of N workers has a named list of N destination files.
+2. After the workers return, confirm every listed file exists and is non-empty. A file that holds only frontmatter or only a heading counts as missing, not done.
+3. Re-dispatch any worker whose output is missing or truncated, then re-verify.
+
+This is a completeness check, not a quality check. It confirms the artifacts exist. The quality pass, em-dash and brand-name grep, sentence-case headings, correct classification, is the separate wiki-lint and grep verification later in the skill.
+
+### Fallback when dispatch is unavailable
+
+If the runtime forbids sub-agent dispatch (some harnesses block it unless the user asked for sub-agents explicitly), that restriction outranks this skill body under the precedence table in `.claude/rules/pause-before-acting.md`. In that case, run the work inline and sequentially, keep every context economy habit in this section, and state in the run report that the work ran sequentially and why.
+
 ## Step 0: inbox expiry check
 
 Before processing, check modification times of all files in the inbox:
@@ -68,6 +130,8 @@ Then proceed with all files (old and new) through the pipeline.
 
 ## Step 1: convert non-markdown files and delete originals
 
+For 5 or more files, dispatch this step and Step 2 together per file, per the roles and worker contract in Parallel execution and token economy above. A worker owns one file end to end across both steps, convert, clean, classify, place, rather than the run doing all of Step 1 for every file and then all of Step 2. A barrier between the two steps wastes the workers that finish early.
+
 Scan the entire inbox (including subdirectories) for `.pdf`, `.docx`, `.PDF`, `.DOCX`, and `.html` files.
 
 1. List all non-markdown files found
@@ -79,6 +143,8 @@ Scan the entire inbox (including subdirectories) for `.pdf`, `.docx`, `.PDF`, `.
 Do not ask for confirmation. The owner granted standing authorization on 2026-08-15 to delete an inbox original once its conversion has succeeded, so `file-protection.md`'s ask-first step is already satisfied for this one narrow case. Prefix each deletion with `CLAUDE_APPROVED_DELETE=1` to clear the Bash guard, and only after you have verified the converted markdown exists and is non-empty. A failed or partial conversion means the original stays. Always name the deleted originals in the run report so the behavior stays visible.
 
 ## Step 2: clean, classify, and place
+
+When this step runs inside a dispatched batch, each worker executes it immediately after Step 1 for its own files, per Parallel execution and token economy above. Do not wait for every file to clear Step 1 before any file starts Step 2.
 
 ### Clean each file
 
@@ -198,6 +264,10 @@ Apply the writing-style rules to every playbook edit: sentence case headings, no
 
 ## Step 5: review flags, recommend, and implement
 
+### Parallel execution note
+
+The Tier A and B fixes below are independent of each other and of the playbook updates in Step 4, so they can run as one worker while playbook updates run as a separate worker, one worker per playbook file. Tier C proposals stay with the orchestrator and are never delegated. They are judgment calls the user has to rule on, not mechanical work a worker can close on its own.
+
 Step 2 raised flags (growth check, consolidation check, placement uncertainties), but raising a flag is not acting on it. This step closes the loop: implement the fixes that are safe now, and surface the ones that need the user's judgment. Do not skip it. A flag that is only logged and never acted on is exactly how `AI_PM_reference` drifted past the 60-doc threshold for three ingests running.
 
 Sort every flag into the three-state taxonomy from `.claude/rules/system-design-patterns.md`.
@@ -244,19 +314,16 @@ Run `/os-maintain` to update downstream docs (README.md counts, CHANGELOG.md, PL
 
 Run `/ship` to sync docs and push to GitHub. The /ship skill runs docs-sync first (catches any remaining downstream updates) then git-sync.
 
-## Parallelization
-
-When processing many files (5+), use parallel agents for the conversion and cleaning work. Group files by destination folder and dispatch one agent per batch. Each agent handles conversion, cleaning, classification, and writing for its batch. Merge results before running wiki-lint.
-
 ## Shortcuts to resist
 
-See `.claude/rules/anti-rationalization.md` for the general pattern. These three are specific to this skill.
+See `.claude/rules/anti-rationalization.md` for the general pattern. These four are specific to this skill.
 
 | Shortcut | Why it's tempting | Counter |
 |----------|--------------------|---------|
 | "This doc looks similar to others already ingested, I can skip the full cleaning pass" | Similar-looking source material feels like it needs the same light touch | Similar is not identical. Run boilerplate-stripping, brand-neutralizing, and em-dash removal on every file, every time |
 | "The doc is a minor addition, I'll skip updating the folder playbook" | Playbook updates feel like overhead for a one-doc change | One skipped update is how playbooks drift silently. Step 4 runs for every doc whose destination folder has a PLAYBOOK.md, minor or not |
 | "The frontmatter tags feel optional for this file, I'll leave them blank" | Filling in every field feels like busywork when the doc's purpose is obvious | Blank frontmatter is what wiki-lint's `--report` step exists to catch. Fill it in now instead of deferring the fix to a later lint pass |
+| "The batches are small, dispatching workers is more overhead than just doing it inline" | Sequential feels simpler when each file looks quick | Independent file work is the exact case fan-out exists for. Dispatch unless the runtime forbids it or the subtasks genuinely share a write target |
 
 ## Exit checklist
 
@@ -276,3 +343,5 @@ Done when all of these are true:
 - [ ] Os-maintain ran (counts and downstream docs updated)
 - [ ] /ship committed and pushed all changes
 - [ ] Original inbox files deleted after their conversion succeeded, and named in the run report (standing authorization, 2026-08-15, no per-run confirmation)
+- [ ] Work was decomposed and dispatched in parallel where subtasks were independent, or the run report says why it ran sequentially
+- [ ] Every expected worker output was verified to exist and be non-empty before the run was declared done

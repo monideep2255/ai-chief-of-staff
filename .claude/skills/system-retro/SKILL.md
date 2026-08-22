@@ -19,6 +19,8 @@ depends_on:
   - .claude/rules/anti-rationalization.md
   - .claude/scripts/verify_counts.sh
   - .claude/scripts/test_verify_membership.py
+  - .claude/rules/parallel-first.md
+  - .claude/rules/plan-then-fan-out.md
 depended_by:
   - CLAUDE.md
   - AGENTS.md
@@ -74,6 +76,50 @@ Before starting, verify:
 4. At least one prior retro exists (for comparison in Step 6), or this is the first retro
 
 If any system directory is missing, flag it as a critical finding rather than failing silently.
+
+## Parallel execution and token economy
+
+This section is not optional. Step 2 audits six independent areas one after another, and independent work run in sequence is the exact case fan-out exists for. Apply this before starting the audit, not after reading Step 2.
+
+### Dispatch gate
+
+Run these three checks before the audit begins, per `.claude/rules/parallel-first.md`:
+
+1. Does any subtask consume another subtask's output? If yes, those areas run sequentially.
+2. Do two subtasks write the same file? If yes, those areas run sequentially.
+3. Everything else runs in parallel.
+
+The six audit areas in Step 2 (rules, skills, workflows, memory, documentation, growth system) read disjoint sources and write disjoint output files, so they pass the gate and run in parallel by default.
+
+### Role split
+
+Per `.claude/rules/plan-then-fan-out.md`, the orchestrating model gathers the data in Step 1, decides the partition, and writes each worker a contract: which area, which files and commands, which scoring criteria, and where the output goes. Workers run on the cheaper execution tier, Sonnet for substantive audit and analysis, Haiku only for a purely mechanical counting or listing pass such as the Step 2 skills deterministic pre-filter. The orchestrator keeps the scoring in Step 3, the proposal judgment in Step 4, and the final report in Step 7. Never fan out blind: scout the terrain first, then decompose.
+
+### Context economy
+
+Per the context-economy section of `parallel-first.md`, each audit worker writes its findings to its own file under the scratchpad directory and returns roughly 150 to 300 words naming that path plus its headline findings. A worker never returns a transcript or a full file listing. The reason in one sentence: a token entering the orchestrator's context is re-read on every later turn, so a worker that pastes its raw findings back makes a cheap fan-out expensive after the fact.
+
+Three more rules carry over directly:
+
+- Grep before you read. On any file over roughly 500 lines, locate first and read only the slice you need.
+- Prefer a count or a filename list over file bodies when auditing for staleness.
+- Never re-read a file you just wrote.
+
+### Context isolation
+
+Each worker starts clean and receives only its own audit area, the commands or paths it needs, and the scoring criteria for that area. Never pass conversation history, another worker's findings, or the previous retro report into a worker prompt. One deliberate exception: the worker auditing recurrence in Step 6 needs the previous retro report, so hand it that file path, not its contents.
+
+### Dispatch verification
+
+1. Before dispatch, enumerate the expected worker output files. A fan-out of the six audit areas has a named list of six artifacts.
+2. After the workers return, confirm every listed file exists and is non-empty. A file holding only a heading counts as missing, not done.
+3. Re-dispatch any worker whose output is missing or truncated, then re-verify.
+
+This is a completeness check, not a quality check. A missing audit area silently scored as healthy is the specific failure this prevents, and it matters more here than in most skills: an audit that skips an area reports a better health score than the system deserves.
+
+### Fallback
+
+If the runtime forbids sub-agent dispatch (some harnesses block it unless the user asked for sub-agents explicitly), that restriction outranks this skill body under the precedence table in `.claude/rules/pause-before-acting.md`. Run the audit inline and sequentially in that case, keep every context-economy rule in this section, and say in the retro report that it ran sequentially and why.
 
 ## The self-improvement loop
 
@@ -133,6 +179,10 @@ Read these files to understand the current system state:
 - Read the most recent file in `Forge/logs/system-retro/` to compare against last cycle
 
 ### Step 2: audit each area
+
+Each of the six areas below (rules, skills, workflows, memory, documentation, growth system) is an independent worker. Per the dispatch gate in "Parallel execution and token economy" above, none of these areas reads another's output and none writes another's file, so dispatch all six in parallel rather than running through them one after another.
+
+Each worker writes its findings to its own file under the scratchpad directory, named for the area, for example `rules-audit.md`, `skills-audit.md`, `workflows-audit.md`, `memory-audit.md`, `documentation-audit.md`, and `growth-audit.md`. Writing to different files means the six areas never collide. The orchestrator does not read those files in full: it reads each worker's bounded return, and opens a findings file only when a specific finding needs the detail to be scored in Step 3.
 
 Run through each area systematically. For each, ask these diagnostic questions:
 
@@ -303,6 +353,8 @@ If `--deep` mode or if the fix is trivial (typo, date update, adding a missing e
 - Apply the fix immediately
 - Log what was changed
 
+Trivial fixes that touch different files are independent, so dispatch them together, partitioned so no two workers edit the same file. Fixes that touch the same file stay with one worker, or run sequentially. Anything that is not trivial stays a proposal for the user, and proposals are never delegated because they are judgment calls.
+
 For non-trivial fixes, present the proposal and ask: "Want me to apply this now?"
 
 Ask ONE proposal at a time. Wait for the answer.
@@ -452,13 +504,14 @@ To keep scores consistent across retros:
 
 ## Shortcuts to resist
 
-See `.claude/rules/anti-rationalization.md` for the general pattern. These three are specific to this skill.
+See `.claude/rules/anti-rationalization.md` for the general pattern. These four are specific to this skill.
 
 | Shortcut | Why it's tempting | Counter |
 |----------|--------------------|---------|
 | "A prior turn's summary said this fix was applied, so I can skip re-verifying it" | The summary reads as settled fact | A compaction summary is a claim, not a receipt. Confirm via `git status`/`git diff`/a direct read before building on it (cycle 15 retro, 2026-07-03: three "applied" fixes had never actually landed on disk) |
 | "This area looked clean on a quick skim last cycle, I can skim it again" | Skimming feels efficient and the area rarely has issues | Boil-the-lake applies per area, every cycle. A clean skim is evidence for this cycle's score, not a reason to skip reading |
 | "I'll eyeball the severity/confidence/actionability numbers instead of reasoning through each" | The composite formula feels like a formality once you already sense the priority | Write the three numbers and the reasoning for each before multiplying. Skipping this is how a real issue gets silently mis-bucketed into the wrong filter tier |
+| "The audit areas are quick, running them inline is simpler than dispatching workers" | Sequential feels simpler when each area is a couple of commands | Independent audits are the exact case fan-out exists for, and the inline version is what makes a long retro run out of context before the report is written. Dispatch unless the runtime forbids it |
 
 ## Exit checklist
 
@@ -472,3 +525,5 @@ Done when all of these are true:
 - [ ] Retro report was saved to `Forge/logs/system-retro/`
 - [ ] Count verification passed (hardcoded counts match actual file counts)
 - [ ] validate_skill_rules.sh was run during skills audit
+- [ ] Audit areas were dispatched in parallel where independent, or the report says why the run was sequential
+- [ ] Every expected worker output was verified to exist and be non-empty before scoring, so no area was silently scored as healthy because its audit never ran

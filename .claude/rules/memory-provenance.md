@@ -51,6 +51,20 @@ Trust is not permanent for every tier. High-trust memories are evergreen; low-tr
 
 Soft-stale means the memory still appears in recall, it just carries a note that it is old and low-trust, so a future session treats it as a lead to verify, not a fact to assert. Only the two lower tiers decay; documented decisions and research stay unless a newer higher-trust memory supersedes them. This is a decay-versus-evergreen split worth applying to session versus curated memory generally, mapped onto your provenance tiers.
 
+### Update discipline: diff, not rewrite
+
+When new evidence (a correction, a new decision, a changed preference) contradicts or extends an existing memory file, edit the specific fact that changed. Do not regenerate the whole file from scratch. A wholesale rewrite driven by one new data point treats a single recent signal as the whole picture, the same failure a conservative reflective-memory update exists to avoid: a handful of recent, unusual posts should not overwrite a style profile built from years of prior work.
+
+Before rewriting more than a small, targeted diff of an existing memory file, name the specific fact that changed and the evidence that triggered it. If you cannot name both, the update is not yet earned. Hold the existing content.
+
+### Audit trail for edits
+
+Memory files typically live outside a repository's git history (for example, in your coding assistant's own memory directory), so an overwritten fact leaves no record and no way back, unlike `DECISIONS.md` or `OS_IMPROVEMENTS.md`. Before editing an existing memory file's content (not just adding a new file to the index), add a one-line dated trailer at the bottom of the file naming what changed and the evidence:
+
+`Updated 2026-08-22: revised X because Y (source: what triggered it)`
+
+That is the minimum audit trail that makes a bad update reversible: read the trailer, restore the prior fact. It is the memory-file analogue of the `DECISIONS.md` and `OS_IMPROVEMENTS.md` tables, applied to files that sit outside git.
+
 ### Three-state permissions
 
 Allow:
@@ -63,5 +77,7 @@ Ask:
 Deny:
 - Never treat all memories as equal weight when they conflict
 - Never omit the provenance tag on memories about decisions or evidence
+- Never regenerate an existing memory file wholesale when only one fact changed; edit the specific line instead
+- Never revise an existing memory file's content without adding the dated trailer that records what changed and why
 
-The test: when I saved a project or reference memory, did I tag the source quality?
+The test: when I saved a project or reference memory, did I tag the source quality, and when I revised existing content, did I add a dated trailer naming what changed and why instead of silently overwriting it?
