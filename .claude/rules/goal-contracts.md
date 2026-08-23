@@ -44,11 +44,48 @@ Write these before the first action, not after:
 4. Constraints: what must stay true throughout (no deletions without asking, no secrets in logs, style rules hold).
 5. Blocked-stop: the condition under which you stop and report rather than guess. A blocked stop is a valid, honest end state, not a failure to hide.
 
+### Mark what you could not fill, never leave it blank
+
+An element you could not determine is written down as unknown, with a marker, not left empty. A blank reads as "nothing needed here" to the next reader and to the next agent; an explicit marker reads as "this is missing and someone owes it." The two look identical in a rendered document and mean opposite things.
+
+Two markers, borrowed from ProductSpec's honesty primitives:
+
+- `provisional`: the value is a placeholder, not a measurement. A target number nobody has validated, a threshold copied from a neighbouring project, an estimate standing in for a real count. It is usable for now and it is not evidence.
+- `target_owner: unassigned`: the outcome has no accountable person. Distinct from provisional, which is about the number; this is about who answers for it.
+
+Apply them to any element of the five above, and to any metric or acceptance threshold in an evaluation set (`.claude/skills/eval-harness/SKILL.md`). A verify surface built on a `provisional` threshold is still a verify surface, it just carries a visible caveat, which is exactly the distinction between a soft number and a hard one that a blank cell destroys.
+
+This is the same failure class as the unrun-versus-passed rule below. There, a check that could not run must not report as passed. Here, a value that could not be determined must not render as settled. Both are cases of absence disguising itself as a result.
+
 ### Meta-prompt the contract for long runs
 
 Hand-written contracts under-specify. For any run over roughly 30 minutes of autonomous work, do not write the contract from memory. Dispatch a fresh-context agent to read the target files first, surface hidden assumptions, constraints, and edge cases, then draft the five elements. Review its draft, tighten it, then launch. A second agent writing the contract is the maker-checker split of `self-eval-loop` applied upstream of execution instead of after it, and the file reads are independent work that parallelize (`parallel-first`).
 
 The inline variant: let the executing agent write its own goal from your high-level intent. It works only when you hand it the same raw materials (the files to read, the exact validation command, the constraints) and tell it to ask before committing when the intent is underspecified. Otherwise the self-set goal drifts.
+
+### Every gate names its fail direction
+
+A contract with a blocked-stop still leaves one question open: when a check itself errors, times out, or returns something the run cannot parse, does the work continue or does it halt? That is a design decision, not a default. Leaving it implicit means the answer is whatever the exception handler happened to do.
+
+For each gate in a run, write its fail direction beside it:
+
+- Fail open: on error the gate lets the work proceed and marks the result advisory. Choose this when a false stop costs more than a missed catch.
+- Fail closed: on error the gate refuses to act. Choose this when acting on unverified output costs more than doing nothing.
+
+The two directions are not a house style, they are per gate, and one run will often want both. Worked instance: pr-af runs two gates in a single pipeline pointing opposite ways on purpose. Its merge gate fails open, because a false block stops a merge and burns the reviewer's credibility for everything after it. Its human gate fails closed, because posting an unreviewed review is worse than posting nothing. A third case sits underneath both, and it splits in two depending on what the missing piece was for. Source: the pr-af repository dive.
+
+#### Missing tooling: which half is absent decides the direction
+
+"The tool is not installed" is not one case, it is two, and they point opposite ways:
+
+- An optional capability that is merely absent rather than broken degrades to a working path instead of ending the run. Nothing was being checked, so nothing is now unverified. Note the degraded path in the output and continue.
+- A verifier whose tool is absent refuses to pass. A control that quietly succeeds because its binary was never found is worse than no control at all, because the run now carries a green signal that measured nothing, and every later decision trusts it. The gate errors and says which tool is missing.
+
+The distinguishing question is what the missing piece was responsible for. If its absence removes a feature, degrade. If its absence removes a check, fail closed. A skipped check must never be reported, logged, or summarized in the same shape as a passed one.
+
+Worked instance: bench's `scripts/run-gitleaks.mjs` errors out when the gitleaks binary is not on the path rather than skipping the secret scan, so a machine without the tool fails the build instead of shipping unscanned. Source: the bench repository dive.
+
+The failure this blocks is the silent default. An unhandled error inside a verify step usually propagates as a stop, which reads as the safe choice and is often the wrong one: a verify surface that halts on its own flakiness turns a transient error into a blocked-stop, and that trains you to start bypassing the gate.
 
 ### The anti-patterns this blocks
 
@@ -58,7 +95,7 @@ Reward hacking is the second failure mode, and it is subtler. An agent graded on
 
 Budget or iteration caps are checkpoints, not success. When a cap is hit, the run stops and reports progress plus blockers. It does not declare done.
 
-Rigor about the wrong layer is the third failure mode, and it hides behind a verify surface that is genuinely real. A check can audit every leaf output honestly and still certify a wrong answer, because the premise that generated those outputs was never checked. A measured instance: a research run verified all twenty of its facts against two independent authoritative sources each, an honest and rigorous verify surface, and still shipped a wrong answer, because the premise that produced the fact list (the list itself, built from model memory) went unverified. The rigor was real and pointed one layer too low. When the decomposition or premise matters, the verify surface must cover it, not only the leaves. Done-when should name the premise as a checkable element, or the contract certifies a confident wrong answer with a clean audit trail. Source: the CMA plan-big-execute-small repo dive (`Reference-repos/CMA-plan-big-execute-small-Deep-Dive/`).
+Rigor about the wrong layer is the third failure mode, and it hides behind a verify surface that is genuinely real. A check can audit every leaf output honestly and still certify a wrong answer, because the premise that generated those outputs was never checked. A measured instance: a research run verified all twenty of its facts against two independent authoritative sources each, an honest and rigorous verify surface, and still shipped a wrong answer, because the premise that produced the fact list (the list itself, built from model memory) went unverified. The rigor was real and pointed one layer too low. When the decomposition or premise matters, the verify surface must cover it, not only the leaves. Done-when should name the premise as a checkable element, or the contract certifies a confident wrong answer with a clean audit trail. Source: the CMA plan-big-execute-small repo dive.
 
 ### Three-state permissions
 
@@ -75,5 +112,7 @@ Deny:
 - Never change, weaken, delete, narrow, or skip the verify surface (tests, assertions, eval cases, count thresholds) to reach done-when. Changing the check so the check passes is a failed run
 - Never treat a leaf-level verify surface as complete when the premise or decomposition that generated the leaves is itself unverified. The premise is part of the verify surface
 - Never build a verify surface entirely out of checks over the run's own output. At least one signal comes from state the run does not produce
+- Never let a verifier pass because its tool, binary, credential, or data source was missing. A check that could not run reports as unrun, never as passed
+- Never leave a gate's behavior on its own error undefined. Every gate in the contract states whether it fails open or fails closed, and the cost that decided the direction
 
-The test: before I started running to completion, did I write a testable done-when, name how I would verify it, and include at least one signal the run does not produce itself?
+The test: before I started running to completion, did I write a testable done-when, name how I would verify it, include at least one signal the run does not produce itself, state each gate's fail direction, and make every check that could not run report as unrun rather than passed?

@@ -84,6 +84,7 @@ AI answer grounding gate (Atlas search product):
 - Every claim in a generated answer carries an inline citation to its source id. An answer with an uncited sentence fails the gate.
 - The "no source found" path is a tested path, not an afterthought: write a test that feeds a query with zero retrieval hits and asserts the refusal string, not a fabricated answer.
 - Deterministic accept or reject: a citation-grounding or quote-match check decides accept or reject by deterministic rule (exact or substring match after normalization), never by a fuzzy similarity threshold, because a fuzzy accept silently passes a hallucinated quote. Fuzzy scoring may rank repair suggestions only, it never gates acceptance.
+- The evaluation boundary ships as an artifact, not as a caveat in a slide. Any system reporting a pass rate on a fixed query set publishes, in the repository, a document naming every query class, source type, and failure mode that set does not cover. A pass rate with no boundary next to it is read as a completeness figure, and a narrow set is exactly where that misreading is most expensive. Three requirements make it real rather than decorative: enumerate the classes rather than saying the set is not exhaustive, label each item as an absence rather than a measured negative, and state what a reader cannot conclude because of it. Where the evaluation set has missed a real defect, name the instance, since a boundary that lists only theoretical gaps understates the ones already demonstrated.
 - Grade this with the `eval-harness` skill: add cite-or-refuse and citation-coverage as pass/fail acceptance criteria, measured with pass@k against a fixed query set before any answer-generation feature ships.
 
 ### When to invoke the full skill
@@ -92,4 +93,4 @@ For a complete production readiness review, run a six-lens checklist covering se
 
 Full reference: your own dev-workflow standards doc, if you maintain one.
 
-The test: did I apply every security, supply-chain, secrets, multi-agent schema, and AI answer grounding gate before calling Atlas or agentic-search code production-ready?
+The test: did I apply every security, supply-chain, secrets, multi-agent schema, and AI answer grounding gate including a published evaluation boundary before calling Atlas or agentic-search code production-ready?

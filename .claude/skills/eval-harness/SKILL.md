@@ -64,6 +64,25 @@ Why this matters: a metric that cannot tell "safely declined" from "confidently 
 
 Score a silent truncation as fail, not pass, even when the visible slice of the answer looks correct. If a retrieval-and-answer pipeline cannot retain the full output (context window pressure, a result set too large to inject), it must fail explicitly or return a pointer plus preview, never a truncated result presented as complete. Add a test case that forces this path (an oversized retrieval set or a long tool result) and assert the pipeline either returns the explicit-fail signal or the pointer-plus-preview shape, not a quietly clipped answer. This mirrors the no-silent-loss truncation principle in `.claude/rules/system-design-patterns.md` pattern 4.
 
+### Non-deterministic results
+
+An evaluation case that passes on one run and fails on the next is not noise to be averaged away. It is a defect, and it sits in one of two places: in the thing being measured, or in the check that measures it. Both are worth finding, and neither is found by re-running until it goes green.
+
+The rule: when a case flips, root-cause the variance and record the cause before you touch a threshold. A run that reports a pass rate without saying which cases were unstable has reported one number where there were two.
+
+Where variance actually comes from, in rough order of how often it is the real answer:
+
+- The harness samples on a fixed interval while the thing it watches changes faster than that interval. The check is aliasing, and the failure rate is a function of timing, not of correctness.
+- Temperature, seed, or model version drifted between runs. Pin them, or state that they are unpinned and that the figure is therefore a distribution and not a value.
+- Shared state leaked across cases. Case ordering changes the result, which means the cases are not independent and the pass rate is not a sum of independent trials.
+- The thing under test is genuinely non-deterministic. This is a real answer, and it is the only one that justifies reporting a rate instead of a result. Pass^k already measures it, so use that rather than inventing a tolerance.
+
+What is forbidden: widening a tolerance, raising a timeout, adding a retry, or dropping a case in order to make a flaky result stop flapping, before the cause is known. Every one of those changes the check so the check passes, which `goal-contracts` names as a failed run. After the cause is known, recalibrating a threshold is legitimate, and the recalibration is done under the conditions that produced the failure, not under ideal ones. A timeout retuned on an idle machine has been tuned against a case that was never going to fail.
+
+Record the cause next to the case. A one-line note naming what varied and what fixed it is what stops the same flake from being rediscovered and re-suppressed three months later.
+
+Worked instance: an end-to-end browser spec failed about once in sixty because the playhead it asserted on advanced every 134 ms while the test polled at 1 s, so the poll could land anywhere in the cycle. The fix was not a longer timeout. It was a MutationObserver accumulator, because a value that only ever grows cannot be aliased by the polling interval. The threshold was then recalibrated with CPU throttling on, which is the condition the original failure needed.
+
 ## Acceptance criteria template
 
 Use this template for each bot:

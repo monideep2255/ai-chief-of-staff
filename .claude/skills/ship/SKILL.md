@@ -62,6 +62,19 @@ Read `.claude/agents/git-sync.md` for the full agent instructions. Key points:
 5. `git push` to origin
 6. Report commit hash and sync status
 
+## Exit checklist
+
+Do not report the ship as done until every line is checked. A step that could not run is unrun, not passed, and is reported as such per `.claude/rules/goal-contracts.md`.
+
+- [ ] docs-sync ran, and every doc the routing table flagged was either edited or explicitly ruled out
+- [ ] Any verification script this repo runs exited 0, and the exit code checked is the script's own. Piping a script through `tail` or `head` and reading `$?` returns the pipe's status, not the script's, which is how a red gate reads as green
+- [ ] `clean-cc-writes.py` ran, and the working tree holds no stray `.cc-writes` folders or `.DS_Store` files
+- [ ] `git status --short` is clean, or every remaining entry is deliberate and named to the user
+- [ ] Unrelated concerns went into separate commits, per `.claude/rules/git-workflow.md`
+- [ ] No commit message carries a `Co-Authored-By` line
+- [ ] Nothing being reported as shipped lives on a gitignored path
+- [ ] `git rev-parse HEAD origin/main` returns identical hashes, which is the evidence the push actually reached the remote
+
 ## Important
 
 - Always run docs-sync BEFORE git-sync (docs may create additional changes to commit)

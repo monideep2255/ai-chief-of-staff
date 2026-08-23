@@ -14,7 +14,7 @@ depended_by:
 
 ## System design patterns
 
-Six patterns to apply when creating or modifying agents, rules, or skills.
+Seven patterns to apply when creating or modifying agents, rules, or skills.
 
 ### 1. Three-state permissions (allow / deny / ask)
 
@@ -35,11 +35,12 @@ The point: an agent must never make a tier-C change silently. When in doubt betw
 
 The never-auto-destroy floor: a destructive change (deleting or overwriting existing content) is tier C regardless of how confident the fix looks. An automated fix may auto-apply only above a confidence floor, and destruction never clears that floor, it always drops to ask. Confidence tiers decide how fast a non-destructive fix moves; they never authorize a delete.
 
-**Three principles for the permission layer itself.** When you design how permissions are evaluated (a hook, a settings allow/deny list, a skill's gating logic), adopt these three principles for the permission layer itself:
+**Four principles for the permission layer itself.** When you design how permissions are evaluated (a hook, a settings allow/deny list, a skill's gating logic), adopt these four principles for the permission layer itself:
 
 - Deny beats allow. When an allow rule and a deny rule both match, deny wins. Evaluate denies first and let them short-circuit. The `protect-files.sh` hook already works this way; make it the default for any new gate.
 - Permissions are not restored on resume. A grant made in one run does not silently carry into the next. Re-authorize on resume rather than assuming prior consent still holds.
 - Do not rely on the human reading every prompt. People approve the large majority of confirmation prompts without reading them, so safety that depends on a human catching a bad prompt is not safety. Prefer a deterministic deny rule (a hook, a removed tool) over a confirmation prompt whenever the bad action can be named in advance.
+- Count the gates that bind, not the gates that exist. A hook that exits 0 with a warning is a suggestion, and a suggestion can be read and ignored in the same turn. Only a refusal is enforcement. Nine hooks and four refusals is four layers of protection, not nine, and any inventory that does not say which is which will be read as the larger number. Keep a hook inventory that classifies each hook as a binding gate or an advisory convenience, and record every open gap in it: a path guard that matches `Edit|Write` only, for instance, is walked past by a write routed through a Bash heredoc.
 
 ### 2. Snapshot before mutate
 
@@ -49,6 +50,10 @@ Before multi-file system changes (docs-sync, system-retro), log the current HEAD
 
 The strongest constraint is removing the ability, not asking the agent not to use it. When designing a new agent, ask: should this agent be able to edit files? If not, restrict its tools list - don't just say "don't edit" in the prompt.
 
+The pattern generalizes past file editing to any bound you want an agent to respect. A worked example: a reference crawling agent that bounds its crawl through the tool it is handed rather than through an instruction. The fetch tool itself enforces the host scope and the depth limit, so an agent that decides to follow one more link simply cannot, and the bound holds without depending on the agent having read or remembered it. Prompt-side, the same bound is a request the agent is free to reason its way past, and a sufficiently motivated chain of reasoning will.
+
+The design question to ask of any constraint you are about to write into a prompt: could this be a property of the tool instead? Scope, depth, rate, allowed hosts, writable paths, and maximum result size are all enforceable at the tool boundary. Move each one there and the prompt stops carrying rules it cannot actually enforce.
+
 ### 4. Output truncation for large results
 
 When a tool output exceeds a useful size, write to disk and return a pointer (file path + line count + first N lines). Prevents silent truncation where the LLM hallucinates the rest.
@@ -56,6 +61,8 @@ When a tool output exceeds a useful size, write to disk and return a pointer (fi
 When a pointer isn't practical and the output must be truncated inline, default to middle-elision: keep the head and the tail, drop the middle. An oversized result is usually a setup at the start and a conclusion or final state at the end, both of which end-truncation throws away. Reserve plain end-truncation for output that is genuinely append-only with no meaningful tail, like a live log stream.
 
 If the full output cannot be retained, fail explicitly rather than return a truncated result as if complete. The pointer-plus-preview is the record of record, and the offloaded file is disposable.
+
+This pattern is written for tools you author, and it also governs the output you consume. The operating-habit half lives in the context-economy section of `parallel-first` with a stated threshold (roughly 500 lines or 20 KB), because a large read or command result costs the same whether the tool was yours or the harness's: written into context once, re-read on every turn after.
 
 ### 5. The description is a routing contract, not a summary
 
@@ -75,4 +82,21 @@ Three consequences for design:
 
 Skill bodies are already exempt by design: only a skill's name and description live in standing context, and the body loads on invocation. That progressive-disclosure split is the pattern working correctly. Rules do not get it for free, so the glob scope is where you buy it.
 
-The test: when creating or modifying an agent, rule, or skill, did I apply all six patterns where each was relevant, and did I justify always-on loading rather than defaulting to it?
+### 7. Inert configuration is its own failure class
+
+A setting that is defined, defaulted, documented, and read from user input, but never consulted by the code that should act on it, fails in a way neither testing nor review reliably catches. Everything about it looks correct. The default is sensible, the documentation is accurate, the value arrives intact. Nothing ever asks it a question.
+
+This is worse than a missing feature, because configuration is a promise. Someone sets the value, believes the behavior changed, and gets the old behavior with no error and no warning. The bug then surfaces as a downstream symptom far from its cause.
+
+The sibling failure is a bound that does not bound. A cache capped at 2000 entries constrains nothing when the entries are files of unbounded size; the honest cap is in bytes, with oversized single items served uncached rather than admitted. A limit expressed in the wrong unit reads as a safety control and provides none.
+
+Two checks catch both, and both are mechanical rather than a judgment call:
+
+- For every configuration key, name the line that reads it. Search for the key and confirm at least one consumer beyond its definition, its default, and its documentation. If you cannot name that line, the key is inert.
+- For every declared bound, name its unit and ask whether that unit is the thing that can actually grow. Count-based bounds over variable-size items are the common trap.
+
+One consequence to state up front: activating dead configuration is a behavior change, not a fix. Turning it on changes what the system does for everyone who was relying on the accidental behavior, so say so plainly when you do it rather than shipping it as a bug fix.
+
+Two worked instances. The first is an agent runtime whose rule frontmatter fields for conditional loading are defined, documented, and honored by nothing, so every rule loads on every turn regardless of its declared scope; it was found by measurement, not by design review. The second is a pull-request review agent whose ignore-paths setting was defined, defaulted, documented, and merged from API input while never being consulted, so a 60,000-line generated lockfile flowed into every agent prompt and ran the process out of memory.
+
+The test: when creating or modifying an agent, rule, or skill, did I apply all seven patterns where each was relevant, did I justify always-on loading rather than defaulting to it, and can I name the line that reads every setting I added?
