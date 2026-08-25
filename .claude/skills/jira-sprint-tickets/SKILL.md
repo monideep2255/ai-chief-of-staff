@@ -92,8 +92,9 @@ Notes and references
 Default to the shortest description that makes the work understandable and verifiable:
 
 - Parent ticket: Aim for 100 to 200 words. Use one short background paragraph, no more than three current-state bullets, one short expected-result paragraph, and four to seven one-line acceptance criteria.
-- Subtask: Aim for 75 to 150 words. Use one or two background sentences, one expected-result sentence, and three to five one-line acceptance criteria.
-- Put detailed implementation notes, research history, repeated constraints, and test evidence in subtasks or linked artifacts instead of the parent.
+- Subtask: Default to an action-oriented title with no description. Add a description only when the user explicitly requests one or a verified project requirement makes it necessary.
+- Keep shared context, scope, and completion boundaries in the parent. Put detailed implementation notes, research history, and test evidence in linked artifacts instead of repeating them across subtasks.
+- When a subtask description is approved as an exception, use only the minimum detail needed for the handoff. Do not repeat the parent description.
 - Do not repeat the same boundary in every section. State it once where it most affects interpretation.
 - Treat these ranges as defaults, not hard limits. Exceed them only when safety, compliance, reproduction, or an unusually complex handoff requires the detail.
 
@@ -103,13 +104,12 @@ For research or discovery work, also name the decision question, audience, sourc
 
 Each subtask needs:
 
-- An action-oriented summary.
-- Background that explains its role in the parent.
-- An observable expected result.
-- Acceptance criteria that another person can verify.
-- A parent link.
+- An action-oriented summary that is understandable without opening a description.
+- A direct parent link.
 
-Order subtasks by dependency when sequence matters. Keep shared scope and exclusions in the parent instead of duplicating the full parent description in every child.
+Leave the description absent by default. Add one only when the user explicitly requests it or the target project's verified create metadata requires it. When a description is needed, keep it concise and include only child-specific context or verification that the parent does not already provide.
+
+Order subtasks by dependency when sequence matters. Keep shared scope, expected result, acceptance criteria, and exclusions in the parent instead of duplicating them in every child.
 
 When test execution depends on data or configuration, make the test contract observable. Name the approved fixture, fields or schema, index or query configuration, representative cases, expected results, pass conditions, and known limits. A demo script is useful only when it reproduces the agreed checks without embedded credentials.
 
@@ -130,12 +130,12 @@ Before any Jira write, show:
 
 1. Parent summary and complete description.
 2. Metadata table with confirmed values, proposed values and unresolved fields.
-3. Subtask summaries and complete descriptions.
+3. Subtask summaries and description state. Mark each description `absent` by default, and show complete text only for an approved exception.
 4. Creation order and every planned Jira mutation.
 
 Include project-specific or internal update routes as distinct mutations in the preview. Ask for explicit approval of the complete preview. Approval to inspect or draft does not authorize creation, updates, transitions, comments, board changes or deletion.
 
-An explicitly requested title-only ticket may omit its description. Mark that choice in the preview and verify after creation that the description is absent. Do not silently drop a description because the draft is incomplete.
+Subtasks default to title-only. Mark that choice in the preview and verify after creation that the description is absent. A parent or standalone ticket may omit its description only when the user explicitly requests title-only creation. Do not silently drop a required description because the draft is incomplete.
 
 ## Prevent duplicate and ambiguous writes
 
@@ -194,7 +194,7 @@ Deny:
 - The target board, project and exemplar were verified live or clearly labeled unavailable.
 - Project-specific field IDs and label behavior were rechecked.
 - The parent is self-contained and its acceptance criteria are observable.
-- Every subtask is independently useful and linked to the parent.
+- Every subtask title is action-oriented, independently understandable, linked to the parent, and description-free unless an exception was explicitly approved.
 - Unknown metadata remains unresolved rather than invented.
 - The full batch was previewed before any write.
 - Independent writes ran concurrently while parent-key and returned-ID dependencies remained explicit barriers.
@@ -204,4 +204,4 @@ Deny:
 - Partial failures distinguish created, reused, reconciled, failed, and unrun items without destructive rollback.
 - Credentials and unnecessary personal information were not emitted.
 
-The test: could a teammate understand the ticket without private context, verify when it is done, and distinguish copied project convention from metadata that was chosen for this specific work?
+The test: could a teammate understand the parent and each subtask title without private context, verify when the parent is done, and distinguish copied project convention from metadata chosen for this specific work?
