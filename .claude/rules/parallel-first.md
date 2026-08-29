@@ -66,6 +66,10 @@ Dispatched agents fail quietly. An agent stops after writing the first of two fi
 
 This is a completeness check (did all the artifacts get produced?), not a quality check (are they good?). Quality grading is the separate produce-then-grade pass owned by `self-eval-loop.md`. Run both, existence first, then grade what exists. The enumerated expected-output list is the verify surface `goal-contracts.md` requires, applied to a fan-out instead of a single run.
 
+One of those quiet failures now announces itself, and the rest still do not. As of Claude Code 2.1.246 a subagent that stops because it ran out of turns returns what it has, explicitly marked partial, and can be continued with SendMessage instead of re-dispatched from scratch. Before that change it looked finished. So when a return carries the partial marker, continue that agent rather than accepting its output or starting it over: a partial return is a resumable state, not a result. Source: Claude Code 2.1.246 release notes.
+
+That marker closes exactly one failure mode and no others. A truncated artifact, a fan-out that returned zero agents from a bad argument, and an agent that wrote the first of two files and then reported success all still return clean. Absence of a partial marker is therefore no evidence either way, and steps 1 to 3 above remain the only thing standing between those cases and a false done. This is the same distinction `goal-contracts` draws between a check that could not run and a check that passed: a signal that only fires for one condition says nothing about the others.
+
 Do NOT apply when:
 - Task has clear sequential dependencies (step B requires output of step A)
 - There is only one task

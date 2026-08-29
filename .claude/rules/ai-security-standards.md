@@ -31,6 +31,8 @@ Apply to all code written or reviewed in any session: Python, Django, JavaScript
 - Apply resource limits and timeouts. Restrict outbound network access from execution environments where possible.
 - Destroy temporary execution environments after use.
 
+The named mechanism, not just the principle: launching the assistant with `--restricted` (Claude Code 2.1.248) gives a session that cannot execute commands, cannot execute code, cannot fetch from the web, confines file tools to the working directory, and ignores user and project settings. Make it the default in two cases: on a shared or untrusted machine, and on an evaluation harness run, where settings inheritance would otherwise let the harness pick up local configuration and quietly change what is being measured. This is a different boundary from the per-command sandbox override in `sandbox-diagnosis`: the per-command override is a decision inside a session, while choosing `--restricted` is a decision about the session.
+
 ### Protect secrets and restricted data
 
 - No credentials, API keys, or tokens in code, prompts, logs, exception strings, or generated docs. Env vars or approved secrets managers only.

@@ -56,6 +56,7 @@ This directory contains Claude Code configuration for this repository.
 │   ├── meeting-notes.md
 │   ├── objective-review.md
 │   └── socratic.md
+├── agent-memory/                      # Persistent per-agent memory, created by the runtime for the agents whose frontmatter carries memory: (code-reviewer, docs-sync). Governed by memory-provenance
 └── skills/                            # Reusable expertise (loaded on-demand)
     ├── cs-research/SKILL.md
     ├── biomedical-research/SKILL.md
