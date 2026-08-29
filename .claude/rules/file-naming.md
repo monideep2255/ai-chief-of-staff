@@ -12,7 +12,7 @@ depended_by:
 
 ## File naming conventions
 
-**Use sentence case** - same rules as headings. Capitalize only the first word, proper nouns, acronyms, and named tools. Use underscores between words.
+Use sentence case, the same rules as headings. Capitalize only the first word, proper nouns, acronyms, and named tools. Use underscores between words.
 
 | Type | Format | Example |
 |------|--------|---------|
@@ -33,7 +33,7 @@ Triggers:
 Does not trigger:
 
 - Editing an existing file (name is already set)
-- Writing code files (.py, .js, .ts, etc.) — those follow the language's conventions
+- Writing code files (.py, .js, .ts, etc.), which follow the language's conventions
 - Commit messages, CHANGELOG entries, or inline comments
 
 The test: does every file I created match its type's format in the table, using sentence case and underscores between words?

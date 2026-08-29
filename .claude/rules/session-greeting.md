@@ -9,7 +9,7 @@ depended_by:
 
 ## Session greeting
 
-On your **first response** in every conversation, before addressing the user's request, print a brief session summary:
+On your first response in every conversation, before addressing the user's request, print a brief session summary:
 
 ```
 **Session Context**  -  [date]

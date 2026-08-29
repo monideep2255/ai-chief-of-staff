@@ -15,7 +15,7 @@ depended_by:
 
 ## Communication style
 
-- **Ask ONE question at a time** -- never batch. Wait for the answer before asking the next.
+- Ask ONE question at a time, never batch. Wait for the answer before asking the next.
 - Think from first principles. Short sentences, active voice, no buzzwords.
 - Don't use corporate jargon or vague suggestions ("consider", "look into").
 

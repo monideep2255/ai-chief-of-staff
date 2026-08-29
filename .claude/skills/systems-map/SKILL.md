@@ -1,7 +1,7 @@
 ---
 name: systems-map
 author: human
-description: Map any complex system into 8-12 visual building blocks through structured conversation, web research, and iterative refinement. Output path: Learning/visual-synthesis/<topic>/.
+description: Map any complex system into 8-12 visual building blocks through structured conversation, web research, and iterative refinement. TRIGGER when the user says "/systems-map", "map this system", "break this into building blocks", "draw me how this works". Differs from deep-dive, which explains one existing document or topic in prose: this skill produces a new visual decomposition. Output path: Learning/visual-synthesis/<topic>/.
 scope: portable
 argument-hint: <topic>
 user_invocable: true

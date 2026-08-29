@@ -11,7 +11,7 @@ depended_by:
 
 ## Clarify before drafting
 
-Before writing any substantial document (proposal, strategy doc, narrative, discussion prep, or multi-section draft), **stop and run the Socratic clarification process first.**
+Before writing any substantial document (proposal, strategy doc, narrative, discussion prep, or multi-section draft), stop and run the Socratic clarification process first.
 
 ### What counts as "substantial"
 
@@ -29,11 +29,11 @@ Before writing any substantial document (proposal, strategy doc, narrative, disc
 
 ### The process
 
-1. **Identify the story** - what is the one sentence this document needs to make the reader believe?
-2. **Question the structure** - does the order of sections build toward that belief, or just list information?
-3. **Surface assumptions** - what does the writer assume the reader already knows or cares about?
-4. **Find the gaps** - where does the narrative break? Where would a skeptical reader stop and say "why should I care?"
-5. **Confirm with the user** - share the story arc and get explicit approval before writing.
+1. Identify the story: what is the one sentence this document needs to make the reader believe?
+2. Question the structure: does the order of sections build toward that belief, or just list information?
+3. Surface assumptions: what does the writer assume the reader already knows or cares about?
+4. Find the gaps: where does the narrative break? Where would a skeptical reader stop and say "why should I care?"
+5. Confirm with the user: share the story arc and get explicit approval before writing.
 
 ### How to apply
 
@@ -44,9 +44,9 @@ Use the socratic agent's questioning approach. Ask 2-4 targeted questions about:
 
 ### Three-state permissions
 
-- **Allow:** Ask clarifying questions freely before any draft
-- **Ask:** Before rewriting an existing document the user wrote themselves
-- **Deny:** Never skip clarification for substantial documents on your own initiative
+- Allow: Ask clarifying questions freely before any draft
+- Ask: Before rewriting an existing document the user wrote themselves
+- Deny: Never skip clarification for substantial documents on your own initiative
 
 ### Relationship to preserve-your-thinking
 

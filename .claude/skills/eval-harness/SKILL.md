@@ -64,6 +64,17 @@ Why this matters: a metric that cannot tell "safely declined" from "confidently 
 
 Score a silent truncation as fail, not pass, even when the visible slice of the answer looks correct. If a retrieval-and-answer pipeline cannot retain the full output (context window pressure, a result set too large to inject), it must fail explicitly or return a pointer plus preview, never a truncated result presented as complete. Add a test case that forces this path (an oversized retrieval set or a long tool result) and assert the pipeline either returns the explicit-fail signal or the pointer-plus-preview shape, not a quietly clipped answer. This mirrors the no-silent-loss truncation principle in `.claude/rules/system-design-patterns.md` pattern 4.
 
+### Weighted metadata completeness (for corpus and source quality)
+
+Corpus quality is usually reported as one average, which hides the worst sources inside a healthy-looking number. Score it per item instead, on a weighted checklist of the metadata fields a downstream answer actually depends on, then rank ascending and read the bottom of the list.
+
+- Pick the fields that change what a user can do with the item. For a retrieval corpus that is typically description, license, provenance or source identifier, publication or revision date, and a resolvable canonical link.
+- Weight them by consequence, not by convenience. A missing license or missing provenance blocks reuse and blocks citation, so those carry more weight than a missing description, which only degrades ranking.
+- Report the ranked worst items, not just the mean. The mean tells you whether to worry; the ranked tail tells you which sources to fix first.
+- Treat a missing field as missing, never as a zero score that averages away. This is the same absence-is-not-a-negative-finding rule that `.claude/rules/doc-construction.md` applies to known gaps.
+
+Use it two ways: as a standing acceptance criterion on any corpus a bot retrieves from, and as a triage list when a bot's answers are weak for reasons no prompt change fixes. Source: the kg-registry repository dive, whose data-quality dashboard ranks catalogued resources by weighted metadata completeness rather than reporting a single corpus score.
+
 ### Non-deterministic results
 
 An evaluation case that passes on one run and fails on the next is not noise to be averaged away. It is a defect, and it sits in one of two places: in the thing being measured, or in the check that measures it. Both are worth finding, and neither is found by re-running until it goes green.
