@@ -43,6 +43,24 @@ A prose wall is one dense paragraph that crams several distinct facts, steps, or
 
 The smell test: if you are writing ", a X that does A, a Y that does B, and a Z that does C" inside a sentence, that is a list wearing a paragraph. Break it out.
 
+### No sentence openers ending in "ing"
+
+Never start a sentence with a word ending in "ing". It reads as generic machine-written prose, and it delays the subject so the reader waits to find out who is doing the thing. Three forms, all banned:
+
+- Gerund as subject: "Grounding is the metric I watch", "Building the pipeline took three weeks"
+- Participial opener: "Working through the logs, I found the bug"
+- Continuous form leading the sentence: "Running the eval showed the gap"
+
+The fix is the same every time. Lead with the concrete noun, or with the person doing the thing.
+
+- "Grounding is the metric I watch" becomes "The metric I watch is grounding"
+- "Building the pipeline took three weeks" becomes "The pipeline took three weeks to build"
+- "Working through the logs, I found the bug" becomes "I found the bug in the logs"
+
+The one exception: a proper noun or named technology that happens to end in "ing" is a name, not a verb form, so it is fine at the start of a sentence.
+
+This applies to chat replies as well as written deliverables, unlike most of this file. It is a speech habit, so it leaks everywhere.
+
 ### Branding and attribution
 - Never mention specific LLM vendors or products (e.g. no brand names, no CLI tool names)
 - Use generic terms: "LLM", "LLM via CLI tooling", "LLM-assisted"
@@ -73,4 +91,4 @@ Does not trigger:
 - Short inline responses or tool call annotations
 - Content inside code blocks (preserve the original formatting)
 
-The test: does my output contain any em dashes, bold text, title case headings, LLM brand names, informal shortforms (repo, doc), or prose walls (a dense paragraph of 3+ facts that should be a list) in written text?
+The test: does my output contain any em dashes, bold text, title case headings, LLM brand names, informal shortforms (repo, doc), sentences opening with a word ending in "ing", or prose walls (a dense paragraph of 3+ facts that should be a list) in written text?
