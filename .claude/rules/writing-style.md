@@ -43,6 +43,29 @@ A prose wall is one dense paragraph that crams several distinct facts, steps, or
 
 The smell test: if you are writing ", a X that does A, a Y that does B, and a Z that does C" inside a sentence, that is a list wearing a paragraph. Break it out.
 
+### Reader callouts
+
+Use short Note and Tip callouts when they help a reader understand technical material without interrupting the main explanation. The callout belongs immediately after the paragraph, table, or list it clarifies.
+
+For Markdown that supports GitHub-style alerts, use this syntax:
+
+```markdown
+> [!NOTE]
+> Plain English: One short translation, example, or evidence boundary that clarifies the main point.
+
+> [!TIP]
+> Did you know? One optional teaching fact, practical shortcut, or memorable connection.
+```
+
+- Note: Use for plain-English translations, evidence boundaries, definitions, and examples that directly support the reader's understanding.
+- Tip: Use for optional background, practical guidance, or a useful fact that rewards curiosity but is not required to follow the argument.
+- Lead with a clear label when it helps, such as "Plain English:", "Evidence boundary:", "Example:", or "Did you know?".
+- Keep each callout focused on one idea. Use one to three short sentences in most cases.
+- Do not repeat the surrounding prose. A callout must translate, teach, bound, or connect something new.
+- Do not add a callout after every section. Use one only where a new reader is likely to pause, misread a boundary, or benefit from nearby context.
+- Keep claims evidence-bounded. A Tip is not permission to add an interesting but unsupported fact.
+- For Confluence, use the equivalent Note or Info panel instead of pasting GitHub alert syntax that the page may not render.
+
 ### No sentence openers ending in "ing"
 
 Never start a sentence with a word ending in "ing". It reads as generic machine-written prose, and it delays the subject so the reader waits to find out who is doing the thing. Three forms, all banned:
@@ -91,4 +114,4 @@ Does not trigger:
 - Short inline responses or tool call annotations
 - Content inside code blocks (preserve the original formatting)
 
-The test: does my output contain any em dashes, bold text, title case headings, LLM brand names, informal shortforms (repo, doc), sentences opening with a word ending in "ing", or prose walls (a dense paragraph of 3+ facts that should be a list) in written text?
+The test: does my output contain any em dashes, bold text, title case headings, LLM brand names, informal shortforms (repo, doc), sentences opening with a word ending in "ing", or prose walls (a dense paragraph of 3+ facts that should be a list) in written text? If I used a Note or Tip, does it add focused reader help instead of decoration or repetition?
