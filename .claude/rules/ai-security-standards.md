@@ -82,3 +82,5 @@ Deny:
 - Full production readiness review: run a six-lens audit (security, testing, code quality, PR readiness, deployment, production hardening) if you build a review skill for this
 - Full guardrail text and risk table: your organization's AI security documentation, if you maintain one
 - Checkmarx-level Django/SQL/JS patterns: `atlas-production-standards` rule
+
+The test: did I treat every AI-generated output as untrusted until verified, keep secrets out of code, prompts, logs, and generated documents, run generated code in a sandbox rather than on the workstation, grant each agent only the access its documented task needs, and route every action on the high-risk list through a human approval before acting?
