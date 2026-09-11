@@ -249,7 +249,7 @@ Skip this step entirely for docs from other inbox subdirectories (Atlas, root-le
 
 Some library folders have a PLAYBOOK.md, a navigation layer that maps every doc in the folder to a decision tree, a one-sticky-note cheat sheet, and (depending on the folder) a use-case table or a curated reading sequence. A playbook only goes stale when a doc is added without updating it, so the update happens here, in the same run that placed the doc, never as a separate pass to remember later.
 
-The rule is generic, not a fixed list. For every doc you placed in Step 2, check its destination folder for a `PLAYBOOK.md`. If one exists, update it. If the folder has no playbook, skip it (its README table is the navigation). As of August 2026 the folders with playbooks are `AI_PM_reference`, `Agent_engineering`, `AI_industry_and_strategy`, `Career_advancement`, and `AI PM interview preparation`, but do not rely on that list. Check for the file.
+The rule is generic, not a fixed list. For every doc you placed in Step 2, check its destination folder for a `PLAYBOOK.md`. If one exists, update it. If the folder has no playbook, skip it (its README table is the navigation). As of September 2026 the folders with playbooks are `AI_PM_reference`, `Agent_engineering`, `AI_industry_and_strategy`, `Career_advancement`, `AI PM interview preparation`, `Business_and_finance`, and `Software_engineering_future`, but do not rely on that list. Check for the file.
 
 For each new doc whose folder has a playbook, update the parts that playbook actually has. The playbooks are not structurally identical: every one has a decision tree and a cheat sheet, but the rest varies. Check the section headings before editing.
 

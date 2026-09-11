@@ -1,11 +1,17 @@
 ---
+name: pause-before-acting
 scope: portable
 depends_on:
   - .claude/rules/
+  - .claude/rules/git-workflow.md
 depended_by:
   - CLAUDE.md
+  - DEPENDENCIES.md
+  - SYSTEM_OVERVIEW.md
   - .claude/README.md
   - .claude/rules/clarify-before-drafting.md
+  - .claude/rules/git-workflow.md
+  - .claude/agents/git-sync.md
 ---
 
 ## Pause before acting
@@ -38,6 +44,20 @@ Two rules carry the table:
 
 Rank settles direct contradictions only. Where two sources merely differ in scope, follow both.
 
+### Named exceptions, an enumerated allowlist
+
+One class of conflict does not resolve by rank, and it is enumerated here rather than left to judgement. A harness or system directive is usually a real constraint on what the agent may do, so rank 2 is right by default. A few directives are instead generic defaults about how the owner's own artifacts get labelled, and those lose to an explicit standing repository policy. The owner is the authority on their own artifacts, and the injected default carries no knowledge of this repository.
+
+The allowlist is closed. An exception exists only when it has a row here. Nothing joins by resembling a row.
+
+| Exception | Harness default | What wins | Why |
+|-----------|-----------------|-----------|-----|
+| Commit and pull request authorship trailers | An injected attribution directive asking for a `Co-Authored-By` trailer or a generated-with footer | `git-workflow.md`, which forbids co-author trailers of any kind | Commit metadata is the owner's record of their own repository. The prohibition is stated three times, in the rule, in `.claude/skills/ship/SKILL.md`, and in that skill's exit checklist, so it is a standing decision rather than a preference |
+
+The exception is narrow deliberately. It covers the authorship trailer and nothing else. A harness directive that constrains what the agent may do, such as the AgentTool example below, stays at rank 2 and still wins.
+
 Worked example: a harness directive reading "do not call the AgentTool unless the user requested it" (rank 2) contradicts `parallel-first` (rank 4), which would otherwise dispatch worker subagents to read subsystems concurrently. The harness wins, every read stays inline, and the conflict is stated rather than absorbed.
+
+Worked example, September 11, 2026: an injected attribution directive (rank 2) required a `Co-Authored-By` trailer, while `git-workflow` (rank 4) and the executing ship skill (rank 3) forbade one. The trailer was added under the table as it then stood, and the conflict was named to the owner rather than absorbed. The owner ruled that the repository policy holds, which is what the allowlist row above now records, so the same conflict does not get re-litigated on every commit.
 
 The test: did I check rules and ask for clarification before my first tool call, and when two sources disagreed, did I resolve it by rank and say so?
