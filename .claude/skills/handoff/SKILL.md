@@ -38,6 +38,8 @@ Not for: a status update the user reads themselves (just tell them), meeting not
 6. Be ruthless. Cut anything the next agent could trivially get by reading the code or project config.
 7. Carry the chain forward. If a prior handoff exists, fold its still-true state into this one before adding new state, never drop it. Across a chain of handoffs nothing should silently fall off; a fact that was true three handoffs ago and still holds must survive to this one. This is a "carry prior summaries forward" rule for successive compactions, applied here to handoffs.
 8. Anchor the exact stopping point. Capture a verbatim quote or precise pointer of where work left off (the last line edited, the exact command running, the error being chased). A paraphrase drifts; the verbatim anchor does not.
+9. User messages are the specification. Corrections extend the task and never narrow it to whatever the last answer happened to cover. When a decision changed, state the final position and say that it changed, so the next agent does not rebuild the superseded version.
+10. A stated intention is not evidence. "I will run the tests" and "the fix should work" are claims; a command with its result, a passing test, a commit, or a file on disk is proof. Give every DONE item its proof, and put an item with no proof under PARTIAL. (Principles 9 and 10 come from the Compact & Resume brief rules in the chat-on-steroids repository.)
 
 ## Procedure
 
@@ -64,7 +66,7 @@ Session focus: <one line>
 
 ## 3. Current state
 <Factual status. Phrase as status, not actions.
-- DONE: <what is finished and verified>
+- DONE: <what is finished, each item with its proof: a command and its result, a test, a commit, or a file path. An item with no proof belongs under PARTIAL>
 - PARTIAL: <what is wired but incomplete, and what is missing>
 - NOT STARTED: <what has not begun>
 - STOPPED AT: <the exact point work paused, verbatim where possible: "editing foo.py:88, the loop body", "command `pytest -k auth` failing on assert at line 40", "chasing a 500 on /search with query 'x'". Not a paraphrase.>>
@@ -126,6 +128,8 @@ Deny:
 - [ ] Decisions and dead ends captured with the why
 - [ ] Prior handoff state (if any) carried forward, nothing silently dropped
 - [ ] Exact stopping point anchored verbatim in Current state (STOPPED AT)
+- [ ] Every DONE item names its proof; unproven work sits under PARTIAL
+- [ ] Changed decisions state the final position and say that they changed
 - [ ] Secrets redacted; artifacts referenced by path, not pasted
 - [ ] Output in one fenced code block, and saved to a file with the path reported
 

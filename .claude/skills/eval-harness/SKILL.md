@@ -36,6 +36,16 @@ ALL k samples must pass. Higher bar for critical paths.
 
 **Target:** pass^3 >= 70% for critical paths.
 
+### Reporting a best-of-N or pass@k figure
+
+Any best-of-N or pass@k number is optimistic by construction: it takes the maximum over N attempts, so part of the score is sampling luck rather than capability. Report it with three things attached, every time:
+
+1. The k value, stated explicitly. "pass@5 = 88%" is a claim; "88%" is not.
+2. The single-attempt figure beside it. A pass@5 without pass@1 reads as capability when it may be variance.
+3. One sentence stating the metric is optimistic by construction and not comparable across different k, different sampling temperatures, or different harnesses.
+
+Never compare a pass@5 from one harness to a pass@3 from another, or to a single-attempt threshold, and never let a best-of-N figure stand alone in a summary, slide, or abstract. When the selection actually made in production used a different value, a single deterministic call for instance, report that value separately rather than letting the optimistic figure speak for it. Pattern source: the claude-protein-binder-design dataset, which labels its best-of-five-seeds co-fold metric as optimistic and non-comparable at the point of reporting, and keeps the selection-time values in separate columns.
+
 ### Grader types
 
 | Type | How it works | When to use |
@@ -60,9 +70,54 @@ Score abstain by whether a correct source existed, not by whether an answer appe
 
 Why this matters: a metric that cannot tell "safely declined" from "confidently lied" measures accuracy, not safety. Two runs can both show 80% pass while one safely refused the remaining 20% and the other fabricated it. This is the measurement half of the cite-or-refuse grounding gate in `.claude/rules/atlas-production-standards.md`. That rule says refuse when there is no source; this bucket scores whether the refusal happened and was rewarded. The trap is real: a harness that scores refusals as wrong answers will invert its own safety verdict until the bucketing is fixed.
 
+### Compare against a baseline
+
+A score with no baseline cannot tell you what produced it. If a retrieval-and-answer pipeline scores 82 percent, that number is uninterpretable until you know what the base model scores on the same set with none of the pipeline attached. The pipeline is the thing you built. The base model is free. Only the difference between them is your work.
+
+Run at least two arms over an identical evaluation set with identical scoring:
+
+1. Base model alone: one call, no retrieval, no orchestration, no gates. This is the floor.
+2. The full pipeline.
+
+Add a third arm whenever a specific component is in question: the pipeline with that one stage disabled. The gap isolates what that stage is worth, which is the only honest way to defend keeping an expensive stage.
+
+Two rules keep the comparison fair. The grader must be a different model from the one being graded, or it scores its own habits. And every arm faces the same bar, the same prompts, and the same handling of unrunnable cases, with excluded items named and counted rather than quietly dropped.
+
+Report the arms together. "82 percent" is a claim about nothing. "82 percent against a 61 percent single-call baseline, same 50 items, same grader" is a measurement. Pattern source: the pr-af repository dive, which runs a mid-tier open model and competes on pipeline architecture, a claim that means nothing without the baseline published beside it.
+
+### Measured versus projected
+
+A figure after a fix is a measurement only when the frozen case set was rerun through the change that actually shipped. Anything else is a projection, and it is written as one.
+
+- Measured: the same cases, the same grader, and the same scoring, rerun after the change landed. Report it with the run date.
+- Projected: an estimate from reasoning about which failures the fix should cover. Label it "projected", name the method, and never put it in a headline or a before-and-after table as if it ran.
+- Ambiguous population: when "the last 50 runs" or "recent sessions" can mean two different sets, report both denominators side by side rather than picking one.
+
+A projection overstates for a predictable reason: matching failures by symptom counts cases the implemented predicate never touches. Pattern source: the chat-on-steroids repository dive, whose tool error rate report projected a drop from 9.07 to 5.49 percent, reran the frozen corpus, found only 37 of 195 failures actually eliminated, and published 7.35 percent as the number to use.
+
+### Prompt-contract tests
+
+Output-quality evaluation cannot catch a field that silently stops reaching the prompt. The model still answers, fluently, from whatever it did receive, so every quality metric stays green while the system reasons without an input you believe it has. This is a different failure class from a wrong answer and it needs a different test.
+
+The test asserts on the literal prompt string, not on the response. Build the prompt, capture it before the call, and assert that the fields you require are present in the bytes that would be sent.
+
+Three cases per field are worth pinning:
+
+1. Reachability: place a unique marker past every truncation boundary in the chain, then assert the marker appears in every downstream prompt. A field cut to 500 characters in stage one cannot be recovered by a 4000-character allowance in stage three.
+2. The exact cap: assert the boundary value directly, so a later change to a constant fails a test instead of silently shortening the input.
+3. The empty case: assert that an absent field omits its whole section rather than emitting a bare heading, which otherwise tells the model a section exists and is empty.
+
+Add a fourth when order carries authority: assert that operator instructions appear before user-supplied or retrieved content, so precedence holds by position and not only by label.
+
+These tests are deterministic, cost no model calls, and check the one thing entirely under your control, which is what you actually said. Source: the pr-af repository dive, where three stages independently truncated author rationale to 500 characters and reviewers then confidently contradicted reasoning they had never been shown. No output metric could have found it, because nothing in the pipeline knew the text was gone.
+
 ### No-silent-loss truncation (for pipelines that offload or truncate large output)
 
-Score a silent truncation as fail, not pass, even when the visible slice of the answer looks correct. If a retrieval-and-answer pipeline cannot retain the full output (context window pressure, a result set too large to inject), it must fail explicitly or return a pointer plus preview, never a truncated result presented as complete. Add a test case that forces this path (an oversized retrieval set or a long tool result) and assert the pipeline either returns the explicit-fail signal or the pointer-plus-preview shape, not a quietly clipped answer. This mirrors the no-silent-loss truncation principle in `.claude/rules/system-design-patterns.md` pattern 4.
+Score a silent truncation as fail, not pass, even when the visible slice of the answer looks correct. If a retrieval-and-answer pipeline cannot retain the full output (context window pressure, a result set too large to inject), it must fail explicitly or return a pointer plus preview, never a truncated result presented as complete. Add a test case that forces this path (an oversized retrieval set or a long tool result) and assert the pipeline either returns the explicit-fail signal or the pointer-plus-preview shape, not a quietly clipped answer. This mirrors the no-silent-loss truncation principle in `.claude/rules/system-design-patterns.md` pattern 4. Source: opencode repo dive.
+
+### Evidence-record immutability (for retrieval-and-answer pipelines)
+
+For any bot that retrieves and then judges, add an acceptance criterion that the judgment never mutates the evidence. Concretely: the relevance score, confidence value, abstain decision, and any reranked order are written to fields distinct from the retrieved-passage record, and the passage record is byte-identical before and after the answer pass. Test it directly: hash the retrieval output, run the answer and scoring pass, hash again, and assert the two match. A pipeline that fails this cannot be debugged after a bad scoring run, because there is no longer an unjudged record to re-score. This is the measurement half of the non-destructive adjudication clause in `.claude/rules/atlas-production-standards.md`.
 
 ### Weighted metadata completeness (for corpus and source quality)
 
@@ -92,7 +147,7 @@ What is forbidden: widening a tolerance, raising a timeout, adding a retry, or d
 
 Record the cause next to the case. A one-line note naming what varied and what fixed it is what stops the same flake from being rediscovered and re-suppressed three months later.
 
-Worked instance: an end-to-end browser spec failed about once in sixty because the playhead it asserted on advanced every 134 ms while the test polled at 1 s, so the poll could land anywhere in the cycle. The fix was not a longer timeout. It was a MutationObserver accumulator, because a value that only ever grows cannot be aliased by the polling interval. The threshold was then recalibrated with CPU throttling on, which is the condition the original failure needed.
+Worked instance: a bench end-to-end spec failed about once in sixty because the playhead it asserted on advanced every 134 ms while the test polled at 1 s, so the poll could land anywhere in the cycle. The fix was not a longer timeout. It was a MutationObserver accumulator, because a value that only ever grows cannot be aliased by the polling interval. The threshold was then recalibrated with CPU throttling on, which is the condition the original failure needed. Source: the bench repository dive.
 
 ## Acceptance criteria template
 
@@ -117,9 +172,11 @@ Use this template for each bot:
 - pass@1 >= X%
 - pass@3 >= Y%
 - pass^3 >= Z% (if critical path)
+- Report every pass@k with its k, its pass@1 companion, and the optimistic-by-construction note
+- Evidence record byte-identical before and after the answer pass (retrieval-and-answer bots only)
 ```
 
-## Atlas bot evaluations
+## Meridian bot evaluations
 
 ### Design system bot
 
