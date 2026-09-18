@@ -74,11 +74,12 @@ The trap: never summarize the workflow in the description. If the description sp
 
 Anything loaded into standing context (an always-on rule, the project instruction file, a tool schema, an MCP server's tool list) is re-sent on every single turn of every session. Its cost is recurring, not one-time. A 100-line rule that fires on one turn in fifty still bills on all fifty. This is why a rule set grows expensive quietly: each individual addition looks small, and nothing ever measures the total.
 
-Three consequences for design:
+Four consequences for design:
 
 - Glob-scope first. A new rule defaults to conditional loading (a `globs:` frontmatter field) unless it genuinely governs every turn. Always-on is the exception you justify, not the default you fall into. A rule that only matters inside one project folder should never load while you are editing an unrelated document.
 - Measure the always-on set, do not assume it. The budget is a number you can check, so check it. Count the total lines across the rule set, split by whether each rule declares a `globs:` field, and add the length of `CLAUDE.md`, which rides along on every turn too. Record the number each cycle so the trend is visible.
 - The same logic governs standing tool surfaces. Ten MCP servers exposing 50 tools cost their full schema on every turn whether or not any tool is called. `EXTENSIONS.md` already encodes the mechanism-choice side of this (hooks < skills < CLIs < MCP servers by context cost); this pattern is the component-design side.
+- Prune on every model upgrade, do not only append. Standing instructions accumulate workarounds written for a weaker model: a fixed file-reading itinerary, a mandatory "run all tests" step, a blanket "ask before anything consequential". A more capable model follows them literally, so they cost context on every turn and can push it onto the wrong path or stall it where the owner expected it to proceed. When the main model changes, audit the always-on set for three things. First, procedural steps that protect nothing. Delete them. Second, blanket permission gates. Rewrite each as a decision boundary that names what is genuinely unsafe or irreversible and explicitly grants authority inside the safe area. Third, recipes that dictate the route. Replace each with a definition of done. Keep every security, production-access, compliance, and irreversible-action boundary.
 
 Skill bodies are already exempt by design: only a skill's name and description live in standing context, and the body loads on invocation. That progressive-disclosure split is the pattern working correctly. Rules do not get it for free, so the glob scope is where you buy it.
 
