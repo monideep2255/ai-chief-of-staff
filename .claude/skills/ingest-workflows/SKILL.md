@@ -298,9 +298,12 @@ Then continue to Step 6. The A/B changes flow through wiki-lint, os-maintain, an
 Run `/wiki-lint` to regenerate per-folder READMEs with the new docs. If you have a lint script:
 
 ```bash
-python3 Automations/wiki-lint/wiki_lint.py --report   # verify 0 missing frontmatter
+python3 Automations/wiki-lint/wiki_lint.py --report   # verify 0 missing frontmatter and 0 private inbox links
 python3 Automations/wiki-lint/wiki_lint.py             # regenerate READMEs
+git grep -n "mail\.google\.com" -- Projects/   # the report does not cover project intake folders; must print nothing
 ```
+
+The report covers the reference library only, so project intake folders get the separate grep. A dispatched worker can write a webmail link even when its contract forbids one, which is why both checks run rather than trusting the instruction. Any hit fails the step: replace the link with the words "private inbox link omitted" and rerun.
 
 Otherwise, work through the `/wiki-lint` skill's manual steps (it is a bring-your-own-script skill; see its SKILL.md).
 
@@ -333,6 +336,7 @@ Done when all of these are true:
 - [ ] Every doc has frontmatter with description, type, source, added date, actionability
 - [ ] No em dashes remain in any new file (grep verification)
 - [ ] No brand names remain in body text (grep verification)
+- [ ] No private inbox links remain: the report found none and the project intake grep printed nothing
 - [ ] All headings are sentence case
 - [ ] Each doc was placed in the correct destination folder (classification table followed)
 - [ ] Reference folder growth check completed (60-doc threshold flagged, and a split/archive proposal produced when exceeded)

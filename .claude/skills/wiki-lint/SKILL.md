@@ -24,7 +24,7 @@ This skill assumes a reference-doc library folder (referred to below as `Referen
 
 There is no bundled `wiki_lint.py` in this repo. The commands below (`python3 Automations/wiki-lint/wiki_lint.py`) describe the shape of a small script you would write for your own doc set: scan a folder tree for markdown files, read each file's frontmatter, and regenerate a table in that folder's README. It typically does two things:
 
-- `--report`: scan for docs missing frontmatter, print a list, change nothing
+- `--report`: scan for docs missing frontmatter, print a list, change nothing. Worth adding: fail with a nonzero exit on any private webmail link, printing file and line only, never the link itself
 - (no flag): regenerate every folder README from current frontmatter
 
 If you have not built this script yet, do the same work manually: read each doc's frontmatter (or note it is missing), and hand-write or hand-edit the README tables yourself. The frontmatter schema and type vocabulary below are the part worth keeping regardless of whether a script exists.
@@ -54,6 +54,8 @@ For each doc missing frontmatter, infer and write the frontmatter block:
 - `added`: run `git log --follow --format=%as -- "<filepath>" | tail -1`; use today's date if file is untracked
 
 Write the frontmatter block at the very top of the file (before the h1).
+
+The same report should also scan every markdown file under the base, archive subfolders included, for private webmail links, and exit nonzero if it finds any. Print the file and line only, never the link, because the link carries a message or account identifier. Replace each hit with the words "private inbox link omitted". Skip an uncleaned raw inbox folder, since its files have not been processed yet. A nonzero exit is a failed step, not a warning to note and move past.
 
 ### Step 2: Regenerate all READMEs
 
@@ -111,6 +113,7 @@ Every new doc added to `Reference/` gets frontmatter at creation time. Run `/wik
 Done when all of these are true:
 
 - [ ] Missing frontmatter reported and inferred blocks written
+- [ ] The report found zero private inbox links
 - [ ] All READMEs regenerated (via your lint script, or by hand if none exists)
 - [ ] Counts reported: folders updated, docs indexed, missing frontmatter
 - [ ] Any still-missing frontmatter surfaced explicitly, not skipped
