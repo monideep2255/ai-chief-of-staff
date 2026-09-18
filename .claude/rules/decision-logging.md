@@ -56,3 +56,5 @@ Still allowed. If you make a heavyweight decision during a planning session or a
 - Allow: docs-sync auto-appends during structural change detection
 - Deny: never delete or modify existing entries (historical record)
 - Deny: never log content decisions, formatting choices, or ephemeral picks
+
+The test: did I log every heavyweight architecture, tool-selection, or process decision to DECISIONS.md, and skip content, formatting, and ephemeral choices?
