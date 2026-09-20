@@ -24,5 +24,6 @@ A standing authorization is a deletion the owner has approved once, in advance, 
 | 2026-07-15 | Empty `.cc-writes` staging folders, removed by `.claude/skills/ship/clean-cc-writes.py` | `os.rmdir` only, so a folder holding any real file is untouchable |
 | 2026-07-25 | `.DS_Store` files, removed by the same script | Basename must be exactly `.DS_Store`, path must be a regular file, never a directory or symlink |
 | 2026-08-15 | Original PDF, DOCX, and HTML files in the `ingest-workflows` inbox, after conversion | Delete only after verifying the converted markdown exists and is non-empty. A failed or partial conversion means the original stays. The deleted files are named in the run report |
+| 2026-09-20 | Agent scratch files and folders inside the repository, removed by the same script | Whole-name match only, never a substring, so a `_templates/` folder and anything named `temporal` survive. A path git tracks is reported, never deleted. Vendored trees are pruned from the walk. The pattern list and the three guards live in `.claude/skills/ship/SKILL.md` Step 2 |
 
 The test: did I create, delete, or modify any file the user did not ask about, and if I deleted one, did the user approve it in this turn, or does the deletion fall inside a standing authorization named above?
