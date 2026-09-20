@@ -258,14 +258,34 @@ def remove_scratch(scratch_dirs, scratch_files, tracked, dry_run=False):
     return removed, reported
 
 
-def report(label, paths, dry_run=False):
+def report(label, paths, found=0, dry_run=False):
+    """Report a pass. `found` is how many targets the walk saw, so a pass that
+    found targets and removed none says so instead of printing "Clean".
+
+    Without that distinction a removal blocked by the sandbox reads exactly like
+    a tree that was already clean, which is the false pass `goal-contracts`
+    forbids: a step that could not run is unrun, never passed.
+    """
     if not paths:
-        print(f"No {label} found. Clean.")
+        if found:
+            print(
+                f"WARNING: {found} {label} found, none removed. "
+                "See the skip lines above. This pass did not run, it is not clean."
+            )
+        else:
+            print(f"No {label} found. Clean.")
         return
     verb = "Would remove" if dry_run else "Removed"
     print(f"{verb} {len(paths)} {label}:")
     for p in paths:
         print("  -", os.path.relpath(p, REPO_ROOT))
+    # The .cc-writes pass can remove an emptied .claude parent too, so a count
+    # above `found` is expected and only a shortfall is worth warning about.
+    if len(paths) < found:
+        print(
+            f"  WARNING: {found - len(paths)} of {found} not removed, "
+            "see the skip lines above."
+        )
 
 
 def main():
@@ -274,8 +294,13 @@ def main():
         print("DRY RUN: nothing will be deleted.\n")
 
     cc_dirs, ds_files, scratch_dirs, scratch_files = find_targets()
-    report("empty .cc-writes folders", remove_cc_writes(cc_dirs, dry_run), dry_run)
-    report(".DS_Store files", remove_ds_store(ds_files, dry_run), dry_run)
+    report(
+        "empty .cc-writes folders",
+        remove_cc_writes(cc_dirs, dry_run),
+        len(cc_dirs),
+        dry_run,
+    )
+    report(".DS_Store files", remove_ds_store(ds_files, dry_run), len(ds_files), dry_run)
 
     try:
         tracked = tracked_paths()
@@ -291,7 +316,9 @@ def main():
         return 1
 
     removed, reported = remove_scratch(scratch_dirs, scratch_files, tracked, dry_run)
-    report("scratch files and folders", removed, dry_run)
+    # Tracked matches are reported on purpose, so they are not a shortfall.
+    deletable = len(scratch_dirs) + len(scratch_files) - len(reported)
+    report("scratch files and folders", removed, deletable, dry_run)
     if reported:
         print(
             f"\nREPORTED, NOT DELETED: {len(reported)} git-tracked scratch match(es)"
