@@ -220,6 +220,18 @@ The commands above weigh the rules only, and every skill's name and description 
 
 If `/skill-doctor` is unavailable in the running version, record the skills half as unrun rather than as measured, and say so in the retro report. An unrun check is not a passed check.
 
+- **Skill benefit, for prune candidates only:** skill-doctor answers what a skill costs. It says nothing about whether the skill improves the answer, and cost alone is the wrong basis for a prune decision, since it biases toward cutting a large useful skill over a small useless one. `claude plugin eval <skill dir> --ablation with-without` supplies the other half: it runs the suite twice, once with the skill loaded and once without, and reports the score delta. A skill that cannot beat its own absence is a prune candidate however cheap it is.
+
+  Run this only on skills the two questions above already flagged, never across the roster. Measured 2026-09-21: about $0.70 per run, so one case at the default three runs across both arms is roughly $4. A large roster would be absurd; two or three flagged skills per cycle is the intended scope.
+
+  Three findings from the first trial, all of which change how to read the output:
+
+  - Variance is large enough to mislead. The same case on the same skill scored 0.00 and 1.00 on consecutive runs, with the graders splitting FAIL/FAIL/PASS on the first. One run is noise. Keep the default of three runs per arm and read the mean, and treat a delta smaller than the spread between runs as no signal rather than a small signal.
+  - A partial run reports no delta rather than a zero delta. When a cost ceiling stopped the baseline arm mid-suite, the tool printed an em-dash for the delta with the reason "arms graded under different rules" instead of calling it 0.00. Do not fill that in with a number; an ungraded arm is unrun, which is the same distinction Step 1 draws about skill-doctor itself.
+  - Two sandbox denials can block it. The harness builds each run's sandbox at literal `/tmp`, ignoring `TMPDIR`, so that path needs allowlisting or the command needs to run outside the sandbox. Pass `--output-dir` and `--report` to a writable path as well, since the default results location sits under the skills directory, where writes may be denied.
+
+  Write the eval case by hand rather than with `init --bare`, which ignores its target argument and scaffolds into the current directory. The layout is two files: `evals/<case>/prompt.md` carrying `max_turns`, `allowed_tools` and `runs` in frontmatter, and `evals/<case>/graders/criteria.md` carrying `type: llm` and `weight`. Grade against what the skill claims to do in its own description, not against generic answer quality, or the ablation measures the model rather than the skill.
+
 #### Skills audit
 
 **Phase 1: deterministic pre-filter (run first, before any LLM review)**
