@@ -22,7 +22,7 @@ Apply when:
 - Planning a Forge session - what skill gap is actually blocking progress, not just interesting?
 - Choosing what to learn - which book/course directly unblocks current work?
 - Reviewing the OS itself - is the system overhead (rules, docs-sync, retros) justified by the value it creates?
-- Weekly reflection - what blocked me this week? Same thing as last week? Then it's the real constraint.
+- Weekly reflection - what blocked me this week? Same thing as last week? Then it's the real constraint. Read `PAPERCUTS.md` to answer this from a record rather than from memory.
 - Starting a work block - of the options in my cluster (Build/Learn/Practice), which one attacks the constraint?
 
 Do NOT apply when:
@@ -48,4 +48,17 @@ Examples:
 - Forge targets daily practice but logs show weekly frequency - the constraint isn't the system design, it's the trigger. Fix: identify what's crowding out Forge time.
 - Evening work block has 7 options - the constraint is selection, not motivation. Fix: cluster and rotate (your existing daily planning system already did this).
 
-The test: did I identify the bottleneck before optimizing, or did I optimize the first thing I saw?
+## Log the papercuts, or the weekly question has no answer
+
+The weekly reflection above asks whether the same thing blocked you twice. That question is unanswerable from memory, because the small losses are exactly the ones you forget: a command that failed for a non-obvious reason, a denied path, a flag that turned out to be wrong. Each costs a few minutes and none is memorable on its own, which is how a recurring ten-minute tax goes unnoticed for months while you look for a big constraint that is not there.
+
+`PAPERCUTS.md` at the repository root is the record. Two behaviours, both cheap:
+
+- When tooling fails in a way that is not obvious, read it first. A symptom already logged has its fix written next to it.
+- When you lose time to something, append a row in the session where it happened: date, symptom, fix, project. Write the symptom in the words you would search for later, meaning the error text rather than a summary of it. Do not batch entries for later, since the detail that makes an entry useful is gone by the next day.
+
+Log a symptom even when the fix is unknown, marked as such. The third occurrence is what justifies solving it properly, and that count only exists if the first two were written down. Do not log a one-off mistake you understood immediately; this records friction that will recur, not typos.
+
+The scope is honest rather than global: the log lives in this repository and covers sessions that load these rules. Work in another repository does not append to it automatically, and `git-workflow` forbids pointing at this path from any other repository.
+
+The test: did I identify the bottleneck before optimizing, or did I optimize the first thing I saw? And when I lost time to tooling this session, did I append the row while I still had the detail?
