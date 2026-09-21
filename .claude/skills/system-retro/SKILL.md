@@ -216,6 +216,10 @@ wc -l CLAUDE.md   # the project instruction file rides along on every turn too
 
 Then judge the number, do not just record it. Two questions. First, does every always-on rule genuinely apply to every turn, or is one of the top-ten heaviest a candidate for a `globs:` scope? Second, is `CLAUDE.md` drifting long? Under roughly 200 lines is healthy; past that, push detail down into rules or skills that load conditionally. Record the always-on total each cycle so the trend is visible, and flag growth over about 15 percent since the last retro as a trim candidate.
 
+The commands above weigh the rules only, and every skill's name and description sits in the same cached prefix. Run `/skill-doctor`, which reports which loaded skills go unused and what each costs in context, the two figures no disk command can produce. Count the skills from disk alongside the rule totals and record both each cycle. Then judge the skills the same way, with two questions. First, which skills does skill-doctor report as unused, and has any of them now gone unused across more than one cycle? A single quiet cycle means nothing, since many skills are seasonal by design; a pattern across cycles is a prune candidate. Second, does any single skill's context cost stand out enough to justify tightening its description, which is the only part of it that loads before invocation. A skill body is exempt by design and is not the thing to trim.
+
+If `/skill-doctor` is unavailable in the running version, record the skills half as unrun rather than as measured, and say so in the retro report. An unrun check is not a passed check.
+
 #### Skills audit
 
 **Phase 1: deterministic pre-filter (run first, before any LLM review)**

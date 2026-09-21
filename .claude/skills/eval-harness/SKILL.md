@@ -222,6 +222,20 @@ Use this template for each bot:
 
 ## How to run evals
 
+### A test double's unstubbed call raises, never returns a default
+
+Before the steps below, one rule about how the harness itself is built. When a test replaces a dependency, a call the test did not explicitly answer must raise an error naming what was missing. It must never fall through to a default, an empty list, a zero score, or a plausible-looking stub value.
+
+The reason is the failure this whole skill exists to prevent. A permissive default does not fail the test, it passes it for the wrong reason, and the suite then reports green while the path under test never ran. That is strictly worse than a red test, because a red test gets fixed and a falsely green one gets trusted. It is the same judgment `self-eval-loop.md` makes when it decides whether a plausible wrong answer is worse than an obvious failure.
+
+Apply it two ways:
+
+- Build test doubles that raise on any unconfigured call, with the error naming the method and arguments that went unanswered. A developer reading the failure should know immediately which dependency they forgot, not merely that a number came out wrong.
+- Treat a stand-in scorer or placeholder judge as a labeled gap, never as a passing result. A suite running against a stand-in reports its pass rate as provisional and names the stand-in, because the figure measures the harness rather than the bot.
+
+The risk concentrates wherever a real scorer has been swapped for a placeholder, which is exactly when a suite is largest and most reassuring.
+
+
 ### Step 0: tiny run (smoke test before spending real compute)
 
 Before running the full eval suite, run one query through the complete pipeline end-to-end. All real hops, no mocking. This must complete in under 2 minutes.

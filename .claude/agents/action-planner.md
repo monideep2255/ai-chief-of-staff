@@ -4,6 +4,7 @@ description: Converts discussions, goals, or meetings into specific, prioritized
 scope: portable
 tools: Read, Write, Glob
 model: sonnet
+omitClaudeMd: true
 depends_on: []
 depended_by:
   - CLAUDE.md

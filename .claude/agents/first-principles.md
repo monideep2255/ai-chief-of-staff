@@ -4,6 +4,7 @@ description: Explains complex topics using first-principles thinking. Use when a
 scope: portable
 tools: Read, Grep, Glob
 model: opus
+omitClaudeMd: true
 depends_on:
   - .claude/skills/first-principles/SKILL.md
 depended_by:

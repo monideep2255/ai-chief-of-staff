@@ -4,6 +4,7 @@ description: Provides critical, objective feedback instead of agreement and enco
 scope: portable
 tools: Read, Grep, Glob
 model: opus
+omitClaudeMd: true
 depends_on:
   - .claude/skills/objective-review/SKILL.md
 depended_by:
