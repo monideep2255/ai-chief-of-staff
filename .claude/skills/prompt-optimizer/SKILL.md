@@ -136,8 +136,8 @@ Savings: ~170 tokens (85%)
 
 **Anti-pattern: Repeating context I already have**
 ```
-❌ "You know we're working on GQuery AI which is a biomedical
-    research assistant. We have visualization files. Create a
+❌ "You know we're working on Atlas which is a search
+    product. We have visualization files. Create a
     skill for those visualizations."
    Cost: ~100 tokens of redundant context
 
