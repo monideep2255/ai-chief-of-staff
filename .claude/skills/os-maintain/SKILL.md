@@ -224,6 +224,7 @@ Ask (one message, all questions together):
 3. Symlinks: any Reference-repos deep-dives to symlink into reference/?
 4. Project structure: what top-level folders? (or say "infer from stack")
 5. Workflows: which Agent_workflows/ files are relevant? (or "build-relevant defaults")
+6. Will this repository ever be public? If yes, copy `.claude/rules/public-repository-privacy.md` into the new repository and follow its committing-safely guidance before the first commit.
 
 ### Step 3: create repo structure
 
@@ -236,7 +237,7 @@ mkdir -p "$REPO/.claude/skills/<each-skill>"
 mkdir -p "$REPO/.claude/agents"
 
 # Project folders (inferred from stack or user-specified)
-# Python data engineering template (used for agentic-search-data-engineering):
+# Python data engineering template (used for an example data pipeline project):
 mkdir -p "$REPO/data-pipelines/{source1,source2,...,shared}"
 mkdir -p "$REPO/knowledge-graph/{schema,mappings,merge,loader,tests}"
 mkdir -p "$REPO/search-agent/{orchestrator,query_understanding,...}"
