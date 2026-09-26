@@ -46,7 +46,8 @@ This directory contains Claude Code configuration for this repository.
 │   ├── goal-contracts.md
 │   ├── sandbox-diagnosis.md
 │   ├── agent-first-default.md
-│   └── ship-clean-no-bait.md
+│   ├── ship-clean-no-bait.md
+│   └── public-repository-privacy.md
 ├── agents/                            # Custom agents (auto-activated)
 │   ├── action-planner.md
 │   ├── code-reviewer.md

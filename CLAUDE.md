@@ -123,6 +123,7 @@ Behavioral rules are in `.claude/rules/` with glob-based conditional loading:
 | `sandbox-diagnosis` | Always | Before disabling the sandbox for a failed command, classify the failure and apply the durable fix instead |
 | `agent-first-default` | Always | Default to agent-first-draft on reversible tasks, stay hands-on on irreversible ones |
 | `ship-clean-no-bait` | Always | Once work is declared done it must be done and clean: no trickling new findings after done, no rage-bait or click-bait closers |
+| `public-repository-privacy` | Always | This repository is public and permanent: never commit secrets, personal data, employer-internal material, colleague names, local paths, private repository names, or server addresses; commit with a no-reply address, never bypass a pre-commit hook, and rotate any exposed secret at once |
 
 ---
 

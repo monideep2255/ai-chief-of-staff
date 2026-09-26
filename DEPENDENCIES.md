@@ -32,7 +32,7 @@ These pairs must always match. When one changes, copy the change to the other.
 | CLAUDE.md | AGENTS.md | Current focus table |
 | CLAUDE.md | AGENTS.md | Sub-agents table |
 | CLAUDE.md | AGENTS.md | Skills table |
-| CLAUDE.md | README.md | Rules table (both list all 35 rules) |
+| CLAUDE.md | README.md | Rules table (both list all 36 rules) |
 | CLAUDE.md | README.md | Skills table (both list all 26 skills with counts) |
 | README.md system map | actual folder structure | Hardcoded counts (agents, skills, rules) must match reality |
 | .agents/skills/first-principles/SKILL.md | .claude/skills/first-principles/SKILL.md | Portable skill content must match |
@@ -121,9 +121,9 @@ Files that are referenced by the most components. When these break, everything b
 
 | File | Referenced by | Count |
 |------|--------------|-------|
-| CLAUDE.md | All 26 skills, all 8 agents, all 35 rules, session-greeting, docs-sync | 40+ |
+| CLAUDE.md | All 26 skills, all 8 agents, all 36 rules, session-greeting, docs-sync | 40+ |
 | AGENTS.md | All 26 skills, all 8 agents, docs-sync | 30+ |
-| .claude/README.md | All 26 skills, all 8 agents, all 35 rules | 30+ |
+| .claude/README.md | All 26 skills, all 8 agents, all 36 rules | 30+ |
 | README.md | docs-sync, ingest-workflows, multiple skills, system map counts | 10+ |
 | GROWTH_SYSTEM.md | forge, board, system-retro, book-builder skills | 6+ |
 | CHANGELOG.md | docs-sync, ship, ingest-workflows | 5+ |

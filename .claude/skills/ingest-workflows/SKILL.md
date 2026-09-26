@@ -18,6 +18,7 @@ depends_on:
   - .claude/skills/ship/SKILL.md
   - .claude/skills/wiki-lint/SKILL.md
   - .claude/skills/os-maintain/SKILL.md
+  - .claude/scripts/verify_ingest_outputs.py
   - Reference/README.md
 depended_by:
   - CLAUDE.md
@@ -214,7 +215,7 @@ Read each file and classify into the correct destination:
 - Files in `YouTube_sourced_workflows_inbox/improve personal-os/` go to `Reference/Agent_engineering/` (or `AI_PM_reference/` when the doc is about PM craft rather than how agents are built) AND trigger Step 3 (apply OS learnings immediately)
 - Files in the inbox root go to the appropriate `Reference/` subfolder
 
-Rename each file to sentence case with underscores per `.claude/rules/file-naming.md`. Write cleaned content to the destination. Verify: grep for em dashes and brand names in new files (should find 0).
+Rename each file to sentence case with underscores per `.claude/rules/file-naming.md`. Write cleaned content to the destination. Verify: `python3 .claude/scripts/verify_ingest_outputs.py --changed` must exit 0. It checks frontmatter completeness, a table of contents heading, a known gaps heading, zero em or en dashes, zero bold, zero webmail links, and zero ligature-drop artifacts as hard failures, and prints brand-term, gerund-opener, and heading-case findings as warnings that do not block. The script's `CHANGED_ROOTS` and `INDEX_LIBRARY_DIR` constants default to `Reference/` and `Projects/`; adjust them if you rename those folders.
 
 Show the user a summary table after placement: file name, destination folder.
 
@@ -307,6 +308,8 @@ The report covers the reference library only, so project intake folders get the 
 
 Otherwise, work through the `/wiki-lint` skill's manual steps (it is a bring-your-own-script skill; see its SKILL.md).
 
+Then run the same deterministic checks used in Step 2, this time across the whole run plus the index: `python3 .claude/scripts/verify_ingest_outputs.py --changed --index-check` must exit 0. The `--index-check` flag verifies every top-level document in every `Reference/` subfolder is named in `Reference/README.md`, closing the gap where documents go missing from that index and nothing notices because nothing ever counted the two sides against each other.
+
 All docs should already have frontmatter from Step 2. If any are missing, add frontmatter now. Do not silently skip.
 
 ### Os-maintain
@@ -344,6 +347,7 @@ Done when all of these are true:
 - [ ] Recommend-and-implement step ran: A/B fixes applied and noted, C recommendations surfaced to the user with a proposed action
 - [ ] Folder playbooks updated for every destination folder that has a PLAYBOOK.md (decision tree and cheat sheet always; use-case row or intro count where that playbook has them)
 - [ ] Wiki-lint ran successfully (0 missing frontmatter)
+- [ ] `verify_ingest_outputs.py` exited 0 with `--changed` and `--index-check`
 - [ ] Os-maintain ran (counts and downstream docs updated)
 - [ ] /ship committed and pushed all changes
 - [ ] Original inbox files deleted after their conversion succeeded, and named in the run report (standing authorization, 2026-08-15, no per-run confirmation)
