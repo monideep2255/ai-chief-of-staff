@@ -15,6 +15,25 @@ depended_by:
 
 Define what success looks like BEFORE building. Then measure whether the bot meets those criteria.
 
+## Two-tier eval shape
+
+Evaluation runs in two tiers, cheap by default and heavy only when asked for.
+
+- Tier 1, cheap default: one or two local test cases run end to end, for fast feedback. This is the tiny run described in step 0 below. It exists to catch a broken wire before real compute gets spent, not to produce a reportable score.
+- Tier 2, opt-in heavy: the full pass@k run over the complete test set (N >= 10 per the steps below). Run this only after tier 1 passes, and only when the bot is a real candidate for shipping or a metric is actually being reported.
+
+The rule that connects them: expand coverage only after the core cases pass. Adding samples, cases, or graders to a tier 1 run that has not yet passed just makes the eventual failure more expensive to diagnose. Fix the core cases first, then widen.
+
+### Show evidence, don't assert pass
+
+A pass is reported with evidence attached, never as a bare claim. Every "this passed" statement carries three things:
+
+1. The command that was run.
+2. Where the run output landed (a file path, a log location).
+3. The counts behind the claim (n cases, c correct, which k).
+
+"Tests pass" with nothing attached is not a report, it is an assertion. This mirrors the verify surface `.claude/rules/goal-contracts.md` requires before any run is declared done, and the maker-checker split in `.claude/rules/self-eval-loop.md`, where the model that produced the output does not get to grade it. Read both before treating an eval run as finished.
+
 ## Core metrics
 
 ### Pass@k - "can it ever get it right?"
@@ -84,6 +103,12 @@ Add a third arm whenever a specific component is in question: the pipeline with 
 Two rules keep the comparison fair. The grader must be a different model from the one being graded, or it scores its own habits. And every arm faces the same bar, the same prompts, and the same handling of unrunnable cases, with excluded items named and counted rather than quietly dropped.
 
 Report the arms together. "82 percent" is a claim about nothing. "82 percent against a 61 percent single-call baseline, same 50 items, same grader" is a measurement. Pattern source: the pr-af repository dive, which runs a mid-tier open model and competes on pipeline architecture, a claim that means nothing without the baseline published beside it.
+
+### Comparing two approaches: pin the quality bar first
+
+A cost or speed comparison between two systems or two models is meaningless unless the quality bar is pinned equal across both arms before the comparison starts. Timing or pricing two arms that are not answering to the same standard produces a number, but not one that means anything: the cheaper arm may simply be doing less.
+
+The honest baseline is the more rigorous option, not a cheaper lower-rigor one. If one arm is expected to check every fact against two sources and the other checks against one, or skips the check, the two are not comparable until both are held to the stricter rule. Source: the plan-big-execute-small repository dive, where a solo control run had to be prompt-forced to match a team's two-sources-per-fact standard before its bill meant anything as a comparison.
 
 ### Measured versus projected
 
@@ -236,7 +261,7 @@ Apply it two ways:
 The risk concentrates wherever a real scorer has been swapped for a placeholder, which is exactly when a suite is largest and most reassuring.
 
 
-### Step 0: tiny run (smoke test before spending real compute)
+### Step 0: tiny run (tier 1, cheap default, run first)
 
 Before running the full eval suite, run one query through the complete pipeline end-to-end. All real hops, no mocking. This must complete in under 2 minutes.
 
@@ -247,9 +272,11 @@ Confirm:
 - LLM generates an answer
 - Judge outputs a score
 
-If the tiny run fails, stop. Fix the wiring before running N samples. A bug caught here saves the cost of a full eval run.
+If the tiny run fails, stop. Fix the wiring before running N samples. A bug caught here saves the cost of a full eval run. Do not expand coverage past this tier until it passes, and when it passes, report it with the command, the output location, and the counts per the show-evidence gate above, not as a bare "it works".
 
 Skip step 0 only if: you just ran the full eval suite successfully in the same session (pipeline is confirmed working).
+
+### Full run (tier 2, opt-in heavy, only after tier 1 passes)
 
 1. **Define test cases** using the template above. For any retrieval-and-answer bot, include at least one zero-retrieval case: a query with no relevant source, asserting the bot abstains (returns the refusal string) rather than fabricating an answer. The no-source path is a tested case, not an afterthought.
 2. **Generate N samples** (N >= 10 for meaningful stats)
@@ -259,6 +286,8 @@ Skip step 0 only if: you just ran the full eval suite successfully in the same s
    - Simpler: pass@k ~ (number of runs with at least 1 success in k) / (total runs)
 5. **Compare to targets**  -  ship when targets met
 6. **Track over time**  -  eval scores should improve, not regress
+
+Report the tier 2 result the same way: command, output location, counts, per the show-evidence gate above.
 
 ## When to use
 

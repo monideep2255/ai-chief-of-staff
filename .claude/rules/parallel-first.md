@@ -70,6 +70,10 @@ One of those quiet failures now announces itself, and the rest still do not. As 
 
 That marker closes exactly one failure mode and no others. A truncated artifact, a fan-out that returned zero agents from a bad argument, and an agent that wrote the first of two files and then reported success all still return clean. Absence of a partial marker is therefore no evidence either way, and steps 1 to 3 above remain the only thing standing between those cases and a false done. This is the same distinction `goal-contracts` draws between a check that could not run and a check that passed: a signal that only fires for one condition says nothing about the others.
 
+Foreground long-running commands:
+
+A subagent given a long-running command runs it in the foreground with output redirected to a file it then reads, rather than backgrounding it and waiting on a monitor. A backgrounded job leaves the agent returning "waiting", and that reads as progress rather than as a stall. In one workflow verification run on September 5, 2026, three of eight lanes stalled this way, two had to be killed and rerun by the planner, and one burned roughly 50 minutes across two stalls before producing anything.
+
 Do NOT apply when:
 - Task has clear sequential dependencies (step B requires output of step A)
 - There is only one task
@@ -81,6 +85,6 @@ Cross-agent review pattern:
 
 When one agent writes substantial output, dispatching a second fresh-context agent to grade it is the produce-then-grade pattern. That pattern is owned by `self-eval-loop.md` (when to apply, context isolation, three-state permissions). Use it there. Parallel-first's only addition: the grading agent is independent work, so it can be dispatched in parallel with other review dimensions.
 
-The test: are any of my sequential tool calls actually independent, and when I dispatched agents to produce artifacts, did I verify every expected output exists and is non-empty before declaring the dispatch done?
+The test: are any of my sequential tool calls actually independent, and when I dispatched agents to produce artifacts, did I verify every expected output exists and is non-empty before declaring the dispatch done, and did any dispatched agent background a long-running command instead of running it in the foreground with output redirected to a file?
 
 The context-economy test: did anything enter context this turn that I will be re-reading for the rest of the session and did not need, a full file where a slice would do, a full agent transcript where a summary and a path would do, or a re-read of something I just wrote?
