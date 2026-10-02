@@ -37,7 +37,7 @@ Before writing any substantial document (proposal, strategy doc, narrative, disc
 
 ### How to apply
 
-Use the socratic agent's questioning approach. Ask 2-4 targeted questions about:
+Use the socratic agent's questioning approach. Ask 2-4 targeted questions about the points below, one question per message, per `communication-style`:
 - Who is reading this and what do they need to feel after reading it?
 - What is the single strongest argument, and is it front and center?
 - Where does the current version lose the thread?

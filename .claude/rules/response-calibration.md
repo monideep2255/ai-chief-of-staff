@@ -38,6 +38,7 @@ The size test: could you delete a sentence and lose nothing? If yes, delete it. 
 
 - Substantial documents, proposals, and reference docs still follow `doc-construction` (ToC, structure, diagrams). This rule is about conversation, not deliverables.
 - When the user asks for depth ("explain fully", "go deep"), give depth. Right-sized means matched to the ask, not always short.
+- The session greeting on a conversation's first response is the one sanctioned preamble, required by `session-greeting`.
 
 ### Three-state permissions
 

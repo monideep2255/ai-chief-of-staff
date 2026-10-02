@@ -1,7 +1,7 @@
 ---
 name: socratic-questioning
 author: human
-description: Arrives at truth through systematic questioning before providing answers. Use when the user says "help me decide", "should I", "I'm stuck", or needs help thinking through decisions.
+description: Ask clarifying questions one at a time before answering, so the user reaches their own conclusion. TRIGGER on "help me decide", "should I", "I'm stuck", "brainstorm". Differs from board, which gives blunt advisor coaching on a live situation.
 scope: portable
 canonical_copy: .agents/skills/socratic-questioning/SKILL.md
 depends_on: []

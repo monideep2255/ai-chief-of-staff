@@ -32,6 +32,15 @@ When to use parallel tool calls vs. parallel subagents:
 - Parallel tool calls: reading multiple files, running multiple bash commands, independent searches. Use when each subtask is a single tool call.
 - Parallel subagents (Agent tool): when each subtask needs multiple steps, reads files, and produces output independently. Use when the work is non-trivial and self-contained.
 
+Pick each subagent's model by the task's complexity, and pass `model` on every dispatch so no worker silently inherits the main session's model:
+
+- Fable: the hardest judgment and adversarial verification, including the one grading pass on substantial output. One pass, never a grade-fix loop.
+- Opus: subtle reasoning across many files, such as hunting contradictions across a rule set. The main session's planning and synthesis also sit here.
+- Sonnet: the default worker for bounded tasks that still need reading and judgment, such as conversion, audits that run scripts, research lanes, and drafting.
+- Haiku: mechanical work with a fixed answer shape, such as counts, grep-and-list passes, and format conversion. Check its output mechanically before accepting it.
+
+Start at the cheapest tier that fits, and move up when a wrong answer would pass unnoticed. The split between planner and workers is in `plan-then-fan-out`.
+
 Examples:
 
 - User gives 3 tasks → check dependencies first → dispatch independent ones as parallel agents

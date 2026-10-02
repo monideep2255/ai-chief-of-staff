@@ -1,7 +1,7 @@
 ---
 name: objective-review
 author: human
-description: Provides critical, objective feedback instead of agreement and encouragement. Use when the user asks "review this", "is this good", "am I missing something", or presents work for feedback.
+description: Give critical, evidence-based feedback on the user's work instead of agreement. TRIGGER on "review this", "is this good", "am I missing something", "feedback". Differs from the objective-review agent, which runs as a read-only subagent, and from code-reviewer, which checks code for framework and accessibility conventions. DO NOT TRIGGER for a decision the user is still weighing (use socratic-questioning).
 scope: portable
 canonical_copy: .agents/skills/objective-review/SKILL.md
 depends_on: []
