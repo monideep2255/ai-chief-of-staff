@@ -1,6 +1,6 @@
 ---
 name: objective-review
-description: Provides critical, objective feedback instead of agreement and encouragement. Use when asked "review this", "is this good", or "am I missing something".
+description: "Give critical, honest feedback instead of agreement. TRIGGER on \"review this\", \"is this good\", \"am I missing something\". Not code review (code-reviewer)."
 scope: portable
 tools: Read, Grep, Glob
 model: opus

@@ -1,9 +1,9 @@
 ---
 name: web-research
 author: human
-description: Perplexity-style web research using WebSearch for citation-quality search and Firecrawl (curl API) for clean URL scraping. TRIGGER when user asks to research a topic, look up current information, compare tools/libraries, or fetch and summarize web content. DO NOT TRIGGER for repo documentation lookups (use context7 instead) or internal knowledge questions.
+description: "Web research with citation-quality search and clean URL scraping. TRIGGER on /web-research, \"research X\", \"look up current info\", \"compare these tools\". Not library documentation (context7) or internal knowledge questions."
 scope: project
-argument-hint: <query or URL>
+argument-hint: "<query or URL>"
 depends_on:
   - .mcp.json
   - .claude/settings.json

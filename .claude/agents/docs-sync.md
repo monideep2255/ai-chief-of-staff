@@ -1,6 +1,6 @@
 ---
 name: docs-sync
-description: Updates standard documentation files when the repo changes. Use after adding new content.
+description: Update standard documentation files after content or system changes. TRIGGER on "update docs", "sync docs", "refresh docs".
 scope: project
 tools: Read, Write, Edit, Glob, Grep
 model: sonnet
@@ -61,13 +61,13 @@ Use the **Routing Table** below AND `DEPENDENCIES.md` (central dependency map) t
 | Changed file path contains | Docs to check |
 |----------------------------|---------------|
 | `Reference-repos/` (new deep dives) | `.claude/WHATS_NEW.md`, `README.md`, `CHANGELOG.md` |
-| `.claude/agents/` or `.claude/skills/` | `.claude/README.md`, `.claude/WHATS_NEW.md`, `CLAUDE.md`, `AGENTS.md`, `CHANGELOG.md`, `DEPENDENCIES.md`, `EXTENSIONS.md`, `README.md` |
-| `.claude/rules/` | `.claude/README.md`, `.claude/WHATS_NEW.md`, `CLAUDE.md`, `CHANGELOG.md`, `DEPENDENCIES.md` |
+| `.claude/agents/` or `.claude/skills/` | `.claude/README.md` (owns the agent, skill, and rule tables), `.claude/WHATS_NEW.md`, `AGENTS.md` (compact skills index), `CHANGELOG.md`, `DEPENDENCIES.md`, `EXTENSIONS.md`, `README.md` |
+| `.claude/rules/` | `.claude/README.md` (owns the rule table), `.claude/WHATS_NEW.md`, `CHANGELOG.md`, `DEPENDENCIES.md` |
 | `.claude/hooks/` | `.claude/README.md`, `.claude/WHATS_NEW.md`, `CHANGELOG.md`, `DEPENDENCIES.md` |
-| `AGENTS.md` | `CLAUDE.md` (sync Current Focus, Sub-agents, and Skills tables) |
+| `AGENTS.md` | `CLAUDE.md` (sync the Current focus section) |
 | `GOALS.md` | `CHANGELOG.md` (quarterly goals are strategic  -  log changes) |
 | `GROWTH_SYSTEM.md` | `CHANGELOG.md` (growth system structure changes) |
-| `CLAUDE.md` | `AGENTS.md` (sync Current Focus, Sub-agents, and Skills tables) |
+| `CLAUDE.md` | `AGENTS.md` (sync the Current focus section) |
 | `Examples/` | `README.md`, `CHANGELOG.md` |
 | A new project or content folder you add | its own `README.md` (if it has one), `README.md`, `CHANGELOG.md`  -  add a row here once you know the folder name |
 | Anything else | `README.md`, `CHANGELOG.md` (if the change is significant enough to log) |
@@ -153,10 +153,10 @@ Push only when you made at least one change. No changes → no push.
 | File | Purpose | What to Update |
 |------|---------|----------------|
 | `README.md` | System inventory | Recent Updates entry (last 7 only). "Last updated" date. System map tree counts and paths if folder structure changes. Component tables are pointers to CLAUDE.md/EXTENSIONS.md  -  no duplication to sync. |
-| `CLAUDE.md` | Claude Code instructions | **Current Focus, Sub-agents, and Skills tables**  -  must match AGENTS.md exactly |
-| `AGENTS.md` | Universal AI context | **Current Focus, Sub-agents, and Skills tables**  -  must match CLAUDE.md exactly. Also: File naming, Communication preferences, Critical rules sections (AGENTS.md-only). + "Last Updated" date |
+| `CLAUDE.md` | Claude Code instructions | **Current focus section**  -  must match AGENTS.md exactly. The component tables live in `.claude/README.md`, not here. |
+| `AGENTS.md` | Universal AI context | **Current focus section**  -  must match CLAUDE.md exactly. Also keep its Sub-agents table and compact skills index in step with `.claude/README.md`. Also: File naming, Communication preferences, Critical rules sections (AGENTS.md-only). + "Last Updated" date |
 | `CHANGELOG.md` | Change history | New entry at **top** of table (newest first). Skip if already logged. |
-| `.claude/README.md` | Claude Code config docs | Directory structure (add/remove entries when components change). Hooks table (source of truth for hooks). Agent/skill/rule tables are pointers to CLAUDE.md  -  no duplication to sync. |
+| `.claude/README.md` | Claude Code config docs | Directory structure (add/remove entries when components change). Hooks table (source of truth for hooks). It owns the agent, skill, and rule tables: update them here when components change. |
 | `.claude/WHATS_NEW.md` | Session-start context | Rolling list of last 5 system updates. Insert new entry at **top**, drop oldest if > 5. One-line summary + pointer to full guide if applicable. Only for `.claude/` changes (agents, skills, rules, hooks, Reference-Repos deep dives). |
 | `DEPENDENCIES.md` | Central dependency map | Update folder-level tables, component tables, deletion checklist, and dependency chains when system structure changes (new components, renamed folders, new relationships). |
 | `EXTENSIONS.md` | Extension architecture | Plugins table (source of truth  -  has Type column) and MCP servers table (source of truth  -  has Source column). Inventory section is a pointer to CLAUDE.md  -  no counts to sync. "Last updated" date. |
@@ -167,11 +167,9 @@ Push only when you made at least one change. No changes → no push.
 `AGENTS.md` and `CLAUDE.md` are **indexes, not encyclopedias**:
 - Do NOT embed full project context  -  just update the shared tables
 - Do NOT add changelog entries to AGENTS.md  -  those go in `CHANGELOG.md`
-- **Three tables must be identical** between `CLAUDE.md` and `AGENTS.md`:
-  1. **Current Focus** table
-  2. **Sub-agents** table
-  3. **Skills** table
-- When any of these change in one file, copy it to the other
+- The **Current focus** section must be identical between `CLAUDE.md` and `AGENTS.md`
+- `.claude/README.md` owns the Sub-agents, Skills, and Rules tables. AGENTS.md keeps a Sub-agents table and a compact skills index for other agents
+- When Current focus changes in one file, copy it to the other
 - AGENTS.md has extra sections (File naming, Communication preferences, Critical rules, Project context) that don't exist in CLAUDE.md  -  these are AGENTS.md-only and synced from `.claude/rules/` content
 
 ## Update checklist
@@ -181,14 +179,14 @@ Push only when you made at least one change. No changes → no push.
 - [ ] System map tree counts/paths correct (if folder structure changed)
 - [ ] "Last updated" date is current
 
-### 2. CLAUDE.md (source of truth for skills, agents, rules)
-- [ ] Current Focus table matches AGENTS.md exactly
-- [ ] Skills, agents, rules tables are accurate
+### 2. CLAUDE.md (lean standing instructions)
+- [ ] Current focus section matches AGENTS.md exactly
+- [ ] Where things are pointers still resolve (component tables live in `.claude/README.md`)
 - [ ] "Last updated" date is current
 
 ### 3. AGENTS.md (mirrors CLAUDE.md for non-Claude-Code tools)
-- [ ] Current Focus table matches CLAUDE.md exactly
-- [ ] Skills, agents tables match CLAUDE.md exactly
+- [ ] Current focus section matches CLAUDE.md exactly
+- [ ] Sub-agents table and compact skills index match `.claude/README.md`
 - [ ] "Last Updated" date is current
 
 ### 4. CHANGELOG.md
@@ -239,10 +237,10 @@ Docs are already current. Nothing to update. No push.
 4. **Insert CHANGELOG entries at the top**  -  Newest first, never append to the bottom.
 5. **All doc files are indexes, not encyclopedias**  -  Keep every doc file lean:
    - `README.md`: System map + tables. No tutorials, no usage examples, no book inventories. Link to CLAUDE.md/AGENTS.md for details.
-   - `CLAUDE.md` / `AGENTS.md`: Current Focus + agents/skills/rules tables. No embedded project context.
+   - `CLAUDE.md`: Current focus plus short pointers. `AGENTS.md`: Current focus, agents table, compact skills index. No embedded project context.
    - `.claude/README.md`: Directory tree + config tables. No duplication of CLAUDE.md content.
    - `CHANGELOG.md`: One row per change. Recent Updates in README.md: last 7 entries only.
-   - `GROWTH_SYSTEM.md`: Architecture + decision points. No skill/agent listings (those live in CLAUDE.md).
+   - `GROWTH_SYSTEM.md`: Architecture + decision points. No skill/agent listings (those live in .claude/README.md).
    - If a section grows beyond a table, it belongs in its own file, not in an index.
 6. **Only push when something changed**  -  No changes → no push.
 7. **Don't delete files or folders without explicitly informing the user first.**

@@ -1,7 +1,7 @@
 ---
 name: eval-harness
 author: human
-description: "Evaluation framework for AI bots, covering pass@k metrics and acceptance criteria templates for design system, React component, and P2 migration bots. Use when the user says: \"how do I evaluate this bot\", \"set up evals\", \"what is our acceptance criteria\", \"is this bot good enough to ship\", \"measure pass@k\". Read this before building an AI bot, not after. Differs from self-eval-loop, which grades a single document with a fresh-context agent rather than measuring model output quality across a task set."
+description: "Evaluation framework for AI bots: pass@k metrics and acceptance criteria templates. TRIGGER on \"set up evals\", \"is this bot good enough to ship\", \"measure pass@k\"; read before building a bot."
 scope: project
 depends_on: []
 depended_by:

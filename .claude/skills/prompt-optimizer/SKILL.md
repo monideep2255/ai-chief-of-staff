@@ -1,7 +1,7 @@
 ---
 name: Prompt Optimizer
 author: human
-description: "Analyze and optimize a prompt for token efficiency, parallelization opportunities, and background agent usage. Use when the user says: /optimize, \"optimize this prompt\", \"make this prompt better\", \"why is this burning so many tokens\", \"can this run in parallel\", \"rewrite this prompt\". Operates on the prompt text itself, unlike parallel-first, which governs how the agent dispatches work once the prompt is understood."
+description: "Optimize a prompt for token efficiency, parallelism, and background agents. TRIGGER on /optimize, \"optimize this prompt\", \"why is this burning tokens\", \"rewrite this prompt\". Works on the prompt text, unlike parallel-first, which governs dispatch."
 scope: portable
 depends_on: []
 depended_by:

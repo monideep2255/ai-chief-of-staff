@@ -1,9 +1,9 @@
 ---
 name: repo-dive
 author: human
-description: Clone an external GitHub repo, symlink it into Reference-Repos, and generate two deep-dive markdown files (Everything + System-Upgrade-Guide). TRIGGER when user shares a GitHub URL and wants to analyze/study/learn from it, says "dive into this repo", "analyze this repo", or "what can we learn from this". DO NOT TRIGGER for repos that are already cloned or for general GitHub operations.
+description: "Shallow-clone a repository to scratch, write two Markdown analyses plus an HTML explainer pinned to the commit, then delete the clone. TRIGGER on a GitHub, GitLab, or Hugging Face URL to study, or /repo-dive. Not a clone to keep and work in."
 scope: project
-argument-hint: <github-url> [--name <display-name>]
+argument-hint: "<repository-url> [--name <display-name>] | --audit-legacy"
 produces_docs: true
 depends_on:
   - .claude/rules/os-improvement-logging.md

@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Reviews Atlas code for Django conventions, USWDS compliance, and accessibility. Use when asked "review this code", "code review", or "check this PR".
+description: "Review Atlas code for Django conventions, USWDS compliance, and accessibility. TRIGGER on \"review this code\", \"code review\", \"check this PR\"."
 scope: project
 tools: Read, Grep, Glob, Bash
 model: opus

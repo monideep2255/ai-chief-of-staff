@@ -1,9 +1,9 @@
 ---
 name: systems-map
 author: human
-description: Map any complex system into 8-12 visual building blocks through structured conversation, web research, and iterative refinement. TRIGGER when the user says "/systems-map", "map this system", "break this into building blocks", "draw me how this works". Differs from deep-dive, which explains one existing document or topic in prose: this skill produces a new visual decomposition. Output path: Learning/visual-synthesis/<topic>/.
+description: "Map a complex system into 8-12 visual building blocks through conversation and research. TRIGGER on /systems-map, \"map this system\", \"draw me how this works\". Not deep-dive (prose)."
 scope: portable
-argument-hint: <topic>
+argument-hint: "<topic>"
 user_invocable: true
 agent: true
 model: opus
@@ -44,6 +44,8 @@ This is a learning skill, not a production skill. The process of building the ma
 4. One question at a time: respect how systems thinkers reason
 
 ## Workflow
+
+Before anything else, read `.claude/rules/book-inventory-check.md` and run its gate. That rule loads only when a file under `Learning/` is touched, so it may not be in context yet.
 
 Four phases: Articulate, Externalize, Challenge, Refine.
 

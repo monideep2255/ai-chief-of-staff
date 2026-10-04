@@ -1,6 +1,6 @@
 ---
 name: action-planner
-description: Converts discussions, goals, or meetings into specific, prioritized to-do lists. Use for planning and task extraction.
+description: "Convert discussions, goals, or meetings into prioritized to-do lists. TRIGGER on \"plan\", \"action items\", \"todos\", \"prioritize\"."
 scope: portable
 tools: Read, Write, Glob
 model: sonnet

@@ -1,7 +1,7 @@
 ---
 name: os-maintain
 author: human
-description: "Auto-maintain downstream docs after system component changes. Default mode: walk depended_by + docs-sync routing, update all indexes. --new-repo mode: scaffold a new project repo directly on Desktop. --tag mode: audit scope coverage. TRIGGER when user says 'os-maintain', 'update indexes', 'new repo', 'scaffold repo', creates/modifies/deletes a rule/skill/agent, or when the system needs doc count verification. Also trigger on 'check scope tags' or 'what would export'. DO NOT TRIGGER for content-only changes (use /ship) or code changes in external repos."
+description: "Update downstream indexes after a rule, skill, agent, or config change; --new-repo scaffolds a repository, --tag audits scope. TRIGGER on /os-maintain, \"update indexes\", \"scaffold repo\", \"check scope tags\". Not content-only changes (ship)."
 scope: project
 user_invocable: true
 agent: true
@@ -90,7 +90,7 @@ Read every file on the work list in a SINGLE message with parallel Read calls.
 Update all stale files in a SINGLE message with parallel Edit calls. Surgical replacements only.
 
 **New component:**
-- Add row to component tables in CLAUDE.md, AGENTS.md, .claude/README.md
+- Add row to the component tables in .claude/README.md (the owner), and to the AGENTS.md skills index or agents table
 - Add to directory tree in .claude/README.md
 - Add WHATS_NEW entry at top (drop oldest if > 5)
 - Add CHANGELOG entry at top
@@ -108,10 +108,7 @@ Update all stale files in a SINGLE message with parallel Edit calls. Surgical re
 - Add CHANGELOG entry
 - Remove from DEPENDENCIES.md
 
-**Bidirectional sync:** after updating CLAUDE.md or AGENTS.md, verify these three tables match between them:
-1. Current Focus
-2. Sub-agents
-3. Skills
+**Bidirectional sync:** after updating CLAUDE.md or AGENTS.md, verify the Current focus section matches between them. Then verify the AGENTS.md Sub-agents table and compact skills index match the tables in .claude/README.md.
 
 ### Phase 6: count verification
 
@@ -175,7 +172,7 @@ Insert at top of table (newest first):
 2. Parallel reads and writes - no sequential file-by-file
 3. Routing table lives in docs-sync - read it, don't duplicate
 4. CHANGELOG always gets an entry for system component changes
-5. Three tables must match between CLAUDE.md and AGENTS.md
+5. Current focus must match between CLAUDE.md and AGENTS.md, and AGENTS.md tables must match .claude/README.md
 6. Don't push - /ship handles that
 7. Don't invent content - only document what actually exists
 8. Scope tag is metadata, not behavior - don't skip updates based on scope

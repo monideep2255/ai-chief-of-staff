@@ -1,7 +1,7 @@
 ---
 name: yt-learn
 author: human
-description: Turn a YouTube video into concrete upgrades to your system, knowledge, and skills, without watching it. TRIGGER when the user drops a YouTube URL and says "yt-learn", "learn from this video", "what can I use from this", "review this podcast/talk", or asks to extract buildable ideas from a video. Not a summarizer and not the Perplexity inbox: it fetches captions locally, fact-checks against the transcript, and drafts approvable changes. Differs from ingest-workflows (files already in the inbox), ingest-conference (conference sessions), and web-research (articles and URLs, not video).
+description: "Turn a YouTube video into approvable system upgrades from its captions, without watching it. TRIGGER on /yt-learn, \"learn from this video\". Not ingest-workflows (inbox files), ingest-conference, or web-research (articles)."
 scope: project
 user_invocable: true
 agent: true

@@ -1,9 +1,9 @@
 ---
 name: system-retro
 author: human
-description: Weekly self-improvement loop for the personal OS itself. Audits rules, skills, agents, workflows, memory, and documentation for staleness, gaps, contradictions, and dead weight. TRIGGER when user says "system retro", "audit the OS", "what needs fixing", "check system health", "weekly retro", or when the session greeting shows the retro reminder. Also trigger on "what's stale", "clean up the system", or "OS health check". DO NOT TRIGGER for content retros (use forge --retro) or code reviews (use code-reviewer).
+description: "Weekly retro of the personal OS: audit rules, skills, agents, memory, and docs for staleness, gaps, contradictions. TRIGGER on /system-retro, \"audit the OS\", \"check system health\", \"what's stale\". Not content retros (forge --retro)."
 scope: project
-argument-hint: [--quick] [--deep] [--focus AREA]
+argument-hint: "[--quick] [--deep] [--focus AREA]"
 depends_on:
   - .claude/rules/
   - .claude/skills/

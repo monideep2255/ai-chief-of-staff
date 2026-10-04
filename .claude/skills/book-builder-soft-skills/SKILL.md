@@ -1,9 +1,9 @@
 ---
 name: book-builder-soft-skills
 author: human
-description: Generate a practice-oriented soft skills book with frameworks, scripts, scenarios, and self-assessments. Output path: Learning/soft-skills/<topic>/. Use when the user says: /book-builder-soft-skills, "write me a book on <people topic>", "help me get better at negotiation or influence or executive presence", "I need practice scripts for <situation>". Differs from book-builder-hard-skills, which covers technical topics, and from the board skill, which coaches one live situation rather than producing a reusable book. The book-inventory-check gate runs first.
+description: "Generate a practice-oriented soft skills book with frameworks, scripts, and scenarios. TRIGGER on /book-builder-soft-skills, \"write me a book on <people topic>\", \"practice scripts for <situation>\". Not technical topics (hard-skills) or live coaching (board)."
 scope: portable
-argument-hint: <topic>
+argument-hint: "<topic>"
 depends_on:
   - .claude/rules/book-inventory-check.md
 depended_by:
@@ -32,6 +32,8 @@ Generate a practice-oriented book on any soft skill topic. Written in first-prin
 - `/book-builder-soft communication for leaders`
 
 ## Workflow
+
+Before anything else, read `.claude/rules/book-inventory-check.md` and run its gate. That rule loads only when a file under `Learning/` is touched, so it may not be in context yet.
 
 ### Step 1: parse the topic
 

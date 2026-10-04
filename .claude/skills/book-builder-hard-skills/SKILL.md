@@ -1,9 +1,9 @@
 ---
 name: book-builder-hard-skills
 author: human
-description: Generate a chapter-by-chapter learning book on a technical topic, in first-principles style with progressive complexity and Mermaid diagrams. Output path: Learning/hard-skills/<topic>/. Use when the user says: /book-builder-hard-skills, "write me a book on <technical topic>", "teach me <technology> properly", "I want to learn <technical subject> deeply". Differs from book-builder-soft-skills, which covers people and communication topics, and from book-builder-from-sources, which synthesizes existing local files instead of generating from scratch. The book-inventory-check gate runs first.
+description: "Generate a chapter-by-chapter first-principles book on a technical topic. TRIGGER on /book-builder-hard-skills, \"write me a book on <technical topic>\", \"teach me <technology> properly\". Not people topics (soft-skills). Inventory gate runs first."
 scope: portable
-argument-hint: <topic>
+argument-hint: "<topic>"
 depends_on:
   - .claude/rules/book-inventory-check.md
 depended_by:
@@ -30,6 +30,8 @@ Generate a chapter-by-chapter learning book on any technical topic, written in f
 - `/book-builder-hard-skills django`
 
 ## Workflow
+
+Before anything else, read `.claude/rules/book-inventory-check.md` and run its gate. That rule loads only when a file under `Learning/` is touched, so it may not be in context yet.
 
 ### Step 1: parse the topic
 

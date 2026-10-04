@@ -1,7 +1,7 @@
 ---
 name: ingest-conference
 author: human
-description: "Process conference session notes into Conference-notes/, from either Perplexity exports in inbox subfolders or a Granola folder pull. Use when the user says: /ingest-conference, \"process my conference notes\", \"I just got back from <conference>\", \"pull the sessions from Granola\", \"write up these talks\". Differs from ingest-workflows, which processes YouTube-inbox exports into the reference folders rather than conference sessions."
+description: "Process conference session notes into Conference-notes/ from Perplexity exports or a Granola pull. TRIGGER on /ingest-conference, \"process my conference notes\", \"pull the sessions from Granola\". Not ingest-workflows."
 scope: project
 user_invocable: true
 agent: true

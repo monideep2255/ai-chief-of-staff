@@ -1,9 +1,9 @@
 ---
 name: forge
 author: human
-description: Daily self-improvement system. 6 rotating coaches, progressive exercises, portfolio artifacts. TRIGGER when user mentions practice, exercise, coaching, skill building, self-improvement, morning routine, daily habit, wants to train a skill, or says "let's practice". Also trigger on energy check-in, mood tracking, or weekly reflection. DO NOT TRIGGER for one-off explanations (use first-principles) or career advice (use board).
+description: "Daily self-improvement gym: 6 rotating coaches, progressive exercises, portfolio artifacts. TRIGGER on /forge, \"let's practice\", \"skill building\", energy check-in, weekly reflection. Not one-off explanations (first-principles) or career advice (board)."
 scope: project
-argument-hint: [--quick] [--deep] [--coach NAME] [--exercise TYPE] [--weekly] [--monthly] [--roadmap]
+argument-hint: "[--quick] [--deep] [--coach NAME] [--exercise TYPE] [--weekly] [--monthly] [--roadmap]"
 depends_on:
   - Forge/config.yaml
   - Forge/progress/skill-tracker.md

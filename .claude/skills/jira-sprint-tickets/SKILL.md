@@ -1,7 +1,7 @@
 ---
 name: jira-sprint-tickets
 author: human
-description: "Review a Jira board or exemplar, learn the target project's live conventions, and safely draft or create tickets, batches, and subtasks. TRIGGER on '/jira-sprint-tickets', 'review this Jira ticket', 'create Jira tickets', 'create sprint tickets', or 'make Jira subtasks'. Project-context skills may supply domain evidence but do not own this reusable Jira workflow."
+description: "Learn a Jira project's live conventions, then review, draft, or create ticket batches with subtasks, approval-gated. TRIGGER on /jira-sprint-tickets, \"create sprint tickets\", \"review this Jira ticket\". Domain context comes from project-context skills."
 scope: portable
 user_invocable: true
 argument-hint: "[review <issue-or-board> | draft <goal> | create]"

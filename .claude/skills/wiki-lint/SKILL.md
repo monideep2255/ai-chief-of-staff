@@ -1,7 +1,7 @@
 ---
 name: wiki-lint
 author: human
-description: Keep your reference-doc library's folder README indexes in sync with doc frontmatter. TRIGGER when user says /wiki-lint, "update wiki index", "sync wiki READMEs", "add to wiki", "regenerate README", or "check frontmatter". Also trigger when a new doc is added to any reference-doc library folder. DO NOT TRIGGER for unrelated folders or for full OS doc maintenance (use os-maintain).
+description: "Keep reference-doc library README indexes in sync with document frontmatter. TRIGGER on /wiki-lint, \"update wiki index\", \"regenerate README\", or a new document in that folder. Not full OS maintenance (os-maintain)."
 scope: project
 agent: true
 model: sonnet

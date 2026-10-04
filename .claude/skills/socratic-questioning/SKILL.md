@@ -1,7 +1,7 @@
 ---
 name: socratic-questioning
 author: human
-description: Ask clarifying questions one at a time before answering, so the user reaches their own conclusion. TRIGGER on "help me decide", "should I", "I'm stuck", "brainstorm". Differs from board, which gives blunt advisor coaching on a live situation.
+description: "Ask clarifying questions one at a time so the user reaches their own conclusion. TRIGGER on \"help me decide\", \"should I\", \"I'm stuck\", \"brainstorm\". Not board (blunt coaching)."
 scope: portable
 canonical_copy: .agents/skills/socratic-questioning/SKILL.md
 depends_on: []

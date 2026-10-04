@@ -1,9 +1,9 @@
 ---
 name: deep-dive
 author: human
-description: Produce a first-principles deep dive on a document, a URL, or a bare topic, written in the user's signature 9-move shape. TRIGGER when the user shares a PDF/MD file, a web link, or a topic and says "deep dive this", "do a deep dive on", "break this down", or "analyze this document/topic". DO NOT TRIGGER for GitHub repos (use /repo-dive) or a quick "what is X" one-liner (use the first-principles agent).
+description: "First-principles deep dive on a document, URL, or topic in the 9-move shape. TRIGGER on /deep-dive, \"deep dive this\", \"break this down\", \"analyze this document\". Not GitHub repositories (repo-dive) or a quick \"what is X\" (first-principles)."
 scope: project
-argument-hint: <file-path | url | topic> [--research]
+argument-hint: "<file-path | url | topic> [--research]"
 produces_docs: true
 depends_on:
   - .claude/skills/web-research/SKILL.md

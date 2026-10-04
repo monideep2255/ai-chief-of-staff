@@ -1,9 +1,9 @@
 ---
 name: board
 author: human
-description: Personal board of directors - brutally honest coaching from a panel of advisor personas you define yourself. TRIGGER when the user needs career or life guidance, is stuck on a decision, wants to talk through a situation, or says "board", "advisors", "what should I do about". DO NOT TRIGGER for skill practice or concept explanations.
+description: "Personal board of directors: blunt coaching from a panel of advisor personas you define, on one live situation. TRIGGER on /board, \"advisors\", \"what should I do about\", career or exit decisions. Not skill practice (forge) or concept explanations (first-principles)."
 scope: project
-argument-hint: [your current situation or question]
+argument-hint: "[your current situation or question]"
 depends_on:
   - .claude/skills/board/context.md
   - CLAUDE.md

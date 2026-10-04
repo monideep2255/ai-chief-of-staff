@@ -1,7 +1,7 @@
 ---
 name: ingest-workflows
 author: human
-description: Process Perplexity exports from YouTube_sourced_workflows_inbox into the correct repo folders with full downstream sync. TRIGGER when user says "new docs in inbox", "process inbox", "ingest these", drops files in the inbox folder, or mentions Perplexity exports to process. Also trigger on "clean up inbox" or "what's in the inbox". DO NOT TRIGGER for conference notes (use ingest-conference) or AI newsletter processing (use ai-digest).
+description: "Process Perplexity exports from the YouTube inbox into the right repository folders with downstream sync. TRIGGER on \"process inbox\", \"ingest these\", \"what's in the inbox\". Not conference notes (ingest-conference)."
 scope: project
 user_invocable: true
 agent: true

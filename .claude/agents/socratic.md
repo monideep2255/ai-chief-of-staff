@@ -1,6 +1,6 @@
 ---
 name: socratic
-description: Asks clarifying questions before giving advice. Use for decisions, brainstorming, and when user seems uncertain.
+description: "Ask clarifying questions before giving advice. TRIGGER on \"should I\", \"help me decide\", \"I'm stuck\", \"brainstorm\"."
 scope: portable
 tools: Read, Grep, Glob
 model: opus

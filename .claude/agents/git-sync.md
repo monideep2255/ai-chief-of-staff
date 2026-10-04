@@ -1,6 +1,6 @@
 ---
 name: git-sync
-description: Handles GitHub push/pull operations. Use when asked to sync with GitHub.
+description: "Handle GitHub push and pull and summarize every commit a pull received. TRIGGER on \"sync\", \"push\", \"pull\", \"push to github\"."
 scope: project
 tools: Bash
 model: sonnet

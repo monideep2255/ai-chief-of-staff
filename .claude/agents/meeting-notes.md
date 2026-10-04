@@ -1,6 +1,6 @@
 ---
 name: meeting-notes
-description: Creates structured meeting notes with nested bullets, decisions, and action items (WHO/WHAT/WHEN). TRIGGER when user says "meeting notes", "I had a meeting", "format these notes", "check-in with [person]", "I talked to [person]", pastes raw meeting notes, or mentions a call/meeting that just happened. DO NOT TRIGGER for general note-taking or documentation tasks.
+description: "Format raw meeting notes into nested bullets, decisions, and action items (who, what, when). TRIGGER on \"meeting notes\", \"I had a meeting\", \"format these notes\". Not general documentation."
 scope: project
 tools: Read, Write, Glob
 model: sonnet

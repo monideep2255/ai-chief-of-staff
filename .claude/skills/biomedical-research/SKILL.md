@@ -1,6 +1,6 @@
 ---
 name: biomedical-research
-description: Fetch and analyze translational biomedical research from PubMed, focusing on high-unmet-need diseases moving toward market. Use when the user says: /biomedical-research, "latest clinical papers", "what is new in PubMed", "recent research on <disease>", "drug development literature". Differs from cs-research, which pulls AI and ML papers from arXiv, and from web-research, which searches the open web rather than a curated literature index.
+description: "Fetch and analyze translational biomedical papers from PubMed on high-unmet-need diseases. TRIGGER on /biomedical-research, \"latest clinical papers\", \"what is new in PubMed\". Not cs-research, which pulls AI and ML papers from arXiv."
 scope: project
 author: human
 depended_by:

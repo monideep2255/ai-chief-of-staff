@@ -1,6 +1,6 @@
 ---
 name: first-principles
-description: Explains complex topics using first-principles thinking. Use when asked "what is X" or "explain Y".
+description: "Explain a concept from fundamentals in simple language. TRIGGER on \"what is X\", \"explain Y\", \"teach me\"."
 scope: portable
 tools: Read, Grep, Glob
 model: opus

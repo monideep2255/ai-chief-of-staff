@@ -1,7 +1,7 @@
 ---
 name: handoff
 author: human
-description: Compact the current session into a single copy-pasteable handoff so a fresh agent with zero memory can continue the work without re-asking or repeating mistakes. TRIGGER when the user says "handoff", "write a handoff", "hand this off", "compact this session", "context is getting full", "wrap up this session", or wants to partition a long task across fresh contexts. DO NOT TRIGGER for meeting notes (use meeting-notes agent) or a project status update the user will read themselves.
+description: "Compact the session into one copy-pasteable handoff so a fresh agent can continue. TRIGGER on /handoff, \"hand this off\", \"context is getting full\", \"wrap up this session\". Not meeting notes or a status update for a human reader."
 scope: project
 user_invocable: true
 depends_on:

@@ -1,9 +1,9 @@
 ---
 name: book-builder-from-sources
 author: human
-description: "Synthesize a folder of existing markdown source files into a structured learning book, using the hard-skills chapter template with first-principles style, Mermaid diagrams, and progressive complexity. Output path: Learning/local-sources/<topic>/. Use when the user says: /book-builder-from-sources, \"turn these notes into a book\", \"make a book out of this folder\", \"synthesize my exports on <topic>\". Differs from the other two book builders, which generate from the model's own knowledge; this one reads local files and stays grounded in them. The book-inventory-check gate runs first."
+description: "Synthesize a folder of existing markdown sources into a first-principles book with Mermaid diagrams. TRIGGER on /book-builder-from-sources, \"turn these notes into a book\". Not the other two book builders, which generate from model knowledge. Inventory gate runs first."
 scope: portable
-argument-hint: <topic> --source <path>
+argument-hint: "<topic> --source <path>"
 depends_on:
   - .claude/rules/book-inventory-check.md
 depended_by:
@@ -30,6 +30,8 @@ Synthesize a folder of markdown research files into a structured, first-principl
 - `/book-builder-from-sources career-growth --source "Learning/local-sources/Career-Growth/"`
 
 ## Workflow
+
+Before anything else, read `.claude/rules/book-inventory-check.md` and run its gate. That rule loads only when a file under `Learning/` is touched, so it may not be in context yet.
 
 ### Step 1: parse input
 
