@@ -29,7 +29,7 @@ Key traits:
 - Namespaced invocation, so names cannot collide across plugins.
 - General-purpose. A plugin has no idea this repo exists, what Atlas is, or what Meridian's conventions are.
 - Enabled or disabled through your global Claude Code settings, not through anything in this repo.
-- Also synced from your claude.ai account. Since Claude Code 2.1.275, a CLI signed in with a claude.ai account loads the skills and plugins enabled there too, and `/context` labels them `claude.ai sync`. Each synced skill adds its description to every turn, so check that list when your standing context grows with no change to this repo. Opt out with `"syncClaudeAiSkills": false` or `"syncClaudeAiPlugins": false` in your user settings.
+- Also synced from your claude.ai account. Since Claude Code 2.1.275, a CLI signed in with a claude.ai account loads the skills and plugins enabled there too, and `/context` labels them `claude.ai sync`. Each synced skill adds its description to every turn, so check that list when your standing context grows with no change to this repo. Opt out with `"syncClaudeAiSkills": false` or `"syncClaudeAiPlugins": false` in your user settings. Measure before you count on a saving: in one tested setup (Claude Code 2.1.289), the opt-out moved the same tokens from the skills figure into the system tools figure, and the total in `/context` did not change.
 
 ## What is an MCP server
 
