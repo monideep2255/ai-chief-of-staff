@@ -193,7 +193,7 @@ Run through each area systematically. For each, ask these diagnostic questions:
 - **Dead weight:** Are any rules never triggered (no matching file patterns, no relevant work)?
 - **Clarity:** Are any rules ambiguous enough that they could be interpreted two ways?
 - **Completeness:** Are there patterns in how the user corrects Claude that should be rules but aren't?
-- **Categorization:** Does each rule's frontmatter scope (alwaysApply vs globs) match how it is documented? Two checks. First, frontmatter integrity: flag any rule that declares both `alwaysApply: true` and a `globs:` field, which is contradictory (book-inventory-check did this on June 22; it must pick one). Build the ground truth: a rule with a `globs:` field is glob-scoped, otherwise it is always-on. Second, doc accuracy: the SYSTEM_OVERVIEW always-on and glob-scoped tables must list exactly those rules, with the split counts matching. The os-maintain count script does not check this (it checks totals, not the always-on/glob split), so it is a retro responsibility. Apply the fix as a trivial fix unless a rule's intended scope is genuinely ambiguous.
+- Categorization: Does each rule's frontmatter scope match how it is documented? Two checks. First, frontmatter integrity: a rule with a `paths:` field is path-scoped and loads only when a matching file is read, and every other rule is always-on. `globs:` and `alwaysApply:` are ignored by the harness, so flag any rule that still carries one. Second, doc accuracy: the SYSTEM_OVERVIEW always-on and path-scoped tables must list exactly those rules, with the split counts matching. The os-maintain count script does not check this (it checks totals, not the always-on/path-scoped split), so it is a retro responsibility. Apply the fix as a trivial fix unless a rule's intended scope is genuinely ambiguous.
 - **Backlog triggers:** walk the Proposed and Deferred tables in `OS_IMPROVEMENTS.md` and read the "Revisit when" column. Re-read every row's trigger each cycle against the evidence; never inherit the previous cycle's fired list. Every row whose trigger has fired gets a decision this cycle: apply it, or move it to Rejected with a stated reason. A fired trigger may not be re-deferred without a new, later trigger written into the cell, since re-deferring with no new date is how a proposal survives three cycles unexamined. Rows still carrying `-` from before the column existed get a concrete trigger assigned or are rejected. Per `.claude/rules/os-improvement-logging.md`.
 - **Context load:** How heavy is the always-on set? Categorization checks that each rule's scope is documented correctly; this checks what that scope costs. An always-on rule is re-sent on every turn of every session, so its cost is recurring, not one-time (see pattern 6 in `system-design-patterns.md`). Measure it, do not estimate it:
 
@@ -202,19 +202,19 @@ Run through each area systematically. For each, ask these diagnostic questions:
 always=0; globbed=0
 for f in .claude/rules/*.md; do
   n=$(wc -l < "$f")
-  if grep -q "^globs:" "$f"; then globbed=$((globbed+n)); else always=$((always+n)); fi
+  if grep -q "^paths:" "$f"; then globbed=$((globbed+n)); else always=$((always+n)); fi
 done
 echo "always-on: $always lines, glob-scoped: $globbed lines"
 
 # Largest always-on rules first, the ones worth scoping or trimming
 for f in .claude/rules/*.md; do
-  grep -q "^globs:" "$f" || echo "$(wc -l < "$f") $f"
+  grep -q "^paths:" "$f" || echo "$(wc -l < "$f") $f"
 done | sort -rn | head -10
 
 wc -l CLAUDE.md   # the project instruction file rides along on every turn too
 ```
 
-Then judge the number, do not just record it. Two questions. First, does every always-on rule genuinely apply to every turn, or is one of the top-ten heaviest a candidate for a `globs:` scope? Second, is `CLAUDE.md` drifting long? Under roughly 200 lines is healthy; past that, push detail down into rules or skills that load conditionally. Record the always-on total each cycle so the trend is visible, and flag growth over about 15 percent since the last retro as a trim candidate.
+Then judge the number, do not just record it. Two questions. First, does every always-on rule genuinely apply to every turn, or is one of the top-ten heaviest a candidate for a `paths:` scope? Second, is `CLAUDE.md` drifting long? Under roughly 200 lines is healthy; past that, push detail down into rules or skills that load conditionally. Record the always-on total each cycle so the trend is visible, and flag growth over about 15 percent since the last retro as a trim candidate.
 
 The commands above weigh the rules only, and every skill's name and description sits in the same cached prefix. Run `/skill-doctor`, which reports which loaded skills go unused and what each costs in context, the two figures no disk command can produce. Count the skills from disk alongside the rule totals and record both each cycle. Then judge the skills the same way, with two questions. First, which skills does skill-doctor report as unused, and has any of them now gone unused across more than one cycle? A single quiet cycle means nothing, since many skills are seasonal by design; a pattern across cycles is a prune candidate. Second, does any single skill's context cost stand out enough to justify tightening its description, which is the only part of it that loads before invocation. A skill body is exempt by design and is not the thing to trim.
 

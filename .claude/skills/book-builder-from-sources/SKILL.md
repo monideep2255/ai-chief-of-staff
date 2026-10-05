@@ -73,14 +73,14 @@ Present the TOC with source file mapping (which files feed each chapter). Ask: "
 ```
 Learning/local-sources/<topic-name>/
 ├── README.md
-├── Part_1_<Part_Name>/
-│   ├── 01_<Chapter_Title>.md
-│   ├── 02_<Chapter_Title>.md
-├── Part_2_<Part_Name>/
-│   ├── 03_<Chapter_Title>.md
+├── part-1-<part-name>/
+│   ├── 01-<chapter-title>.md
+│   ├── 02-<chapter-title>.md
+├── part-2-<part-name>/
+│   ├── 03-<chapter-title>.md
 ```
 
-Use underscores in filenames. Zero-padded two-digit chapter numbers.
+Use lowercase hyphenated names for folders and files. Zero-padded two-digit chapter numbers.
 
 ### Step 6: write readme.md
 

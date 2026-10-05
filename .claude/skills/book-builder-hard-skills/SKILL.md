@@ -73,14 +73,14 @@ Present the proposed table of contents to the user. Ask: "Does this structure lo
 ```
 Learning/hard-skills/<topic-name>/
 ├── README.md
-├── Part_1_<Part_Name>/
-│   ├── 01_<Chapter_Title>.md
-│   ├── 02_<Chapter_Title>.md
-├── Part_2_<Part_Name>/
-│   ├── 03_<Chapter_Title>.md
+├── part-1-<part-name>/
+│   ├── 01-<chapter-title>.md
+│   ├── 02-<chapter-title>.md
+├── part-2-<part-name>/
+│   ├── 03-<chapter-title>.md
 ```
 
-Use underscores in filenames. Zero-padded two-digit chapter numbers.
+Use lowercase hyphenated names for folders and files. Zero-padded two-digit chapter numbers.
 
 ### Step 5: write the README.md
 
@@ -90,7 +90,7 @@ Reference: once you have written a prior book with this skill, use its `Learning
 
 ### Step 6: write each chapter
 
-Every chapter MUST follow this template:
+Every chapter follows this template:
 
 ```markdown
 # Chapter n: <title>
@@ -117,7 +117,7 @@ Every chapter MUST follow this template:
 [2-3 questions testing comprehension.]
 ```
 
-### Step 7: writing rules (CRITICAL)
+### Step 7: writing rules
 
 **Language:**
 - No jargon without immediate definition
@@ -132,7 +132,7 @@ Every chapter MUST follow this template:
 - Each chapter self-contained but references previous ones
 
 **Diagrams:**
-- 3-5 Mermaid diagrams per chapter (non-negotiable)
+- 3-5 Mermaid diagrams per chapter
 - Use `flowchart`, `sequenceDiagram`, or `graph` types
 - Every diagram followed by explanatory paragraph
 - Keep node labels under 30 characters

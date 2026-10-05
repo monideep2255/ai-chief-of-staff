@@ -166,7 +166,7 @@ Apply ALL of these transformations to every `.md` file in the inbox:
    - Excalidraw -> "drawing tool"
    - Lovable -> "AI prototyping tool"
 5. **Sentence case all headings** - capitalize only first word, proper nouns, acronyms
-6. **Reduce bold** - keep bold only for genuinely important terms
+6. Remove bold: strip all bold emphasis from the body, since house style has none and `verify_ingest_outputs.py` fails on any bold span.
 7. **Remove `***` horizontal rules** between sections
 8. **Keep footnote URLs** - source attribution stays
 9. **Add frontmatter** - add wiki-lint frontmatter at the top of each file during cleaning (do not defer to a later step). Use the schema below:
@@ -250,7 +250,7 @@ Skip this step entirely for docs from other inbox subdirectories (Atlas, root-le
 
 Some library folders have a PLAYBOOK.md, a navigation layer that maps every doc in the folder to a decision tree, a one-sticky-note cheat sheet, and (depending on the folder) a use-case table or a curated reading sequence. A playbook only goes stale when a doc is added without updating it, so the update happens here, in the same run that placed the doc, never as a separate pass to remember later.
 
-The rule is generic, not a fixed list. For every doc you placed in Step 2, check its destination folder for a `PLAYBOOK.md`. If one exists, update it. If the folder has no playbook, skip it (its README table is the navigation). As of September 2026 the folders with playbooks are `AI_PM_reference`, `Agent_engineering`, `AI_industry_and_strategy`, `Career_advancement`, `AI PM interview preparation`, `Business_and_finance`, and `Software_engineering_future`, but do not rely on that list. Check for the file.
+The rule is generic, not a fixed list. For every doc you placed in Step 2, check its destination folder for a `PLAYBOOK.md`. If one exists, update it. If the folder has no playbook, skip it (its README table is the navigation). Check for the file.
 
 For each new doc whose folder has a playbook, update the parts that playbook actually has. The playbooks are not structurally identical: every one has a decision tree and a cheat sheet, but the rest varies. Check the section headings before editing.
 
@@ -269,7 +269,7 @@ Apply the writing-style rules to every playbook edit: sentence case headings, no
 
 The Tier A and B fixes below are independent of each other and of the playbook updates in Step 4, so they can run as one worker while playbook updates run as a separate worker, one worker per playbook file. Tier C proposals stay with the orchestrator and are never delegated. They are judgment calls the user has to rule on, not mechanical work a worker can close on its own.
 
-Step 2 raised flags (growth check, consolidation check, placement uncertainties), but raising a flag is not acting on it. This step closes the loop: implement the fixes that are safe now, and surface the ones that need the user's judgment. Do not skip it. A flag that is only logged and never acted on is exactly how `AI_PM_reference` drifted past the 60-doc threshold for three ingests running.
+Step 2 raised flags (growth check, consolidation check, placement uncertainties), but raising a flag is not acting on it. This step closes the loop: implement the fixes that are safe now, and surface the ones that need the user's judgment. Do not skip it. A flag that is only logged and never acted on lets a folder drift past its threshold unnoticed.
 
 Sort every flag into the three-state taxonomy from `.claude/rules/system-design-patterns.md`.
 

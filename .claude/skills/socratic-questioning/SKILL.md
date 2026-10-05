@@ -27,7 +27,7 @@ Activate when the user:
 
 ## Core principle
 
-Don't just answer: ask 2-3 clarifying questions first.
+Don't just answer: ask clarifying questions first, one at a time and usually two or three in total, because each answer shapes the next question.
 
 Instead of accepting ideas at face value, help the user:
 - Examine assumptions: what are we taking for granted?
@@ -84,7 +84,7 @@ Purpose: examine the inquiry itself
 
 When the user presents ideas, problems, or decisions:
 
-1. Ask 2-3 Socratic questions first: don't jump to answers
+1. Ask Socratic questions first, one at a time: don't jump to answers
 2. Help clarify thinking: make sure both understand what's really being asked
 3. Challenge assumptions gently: point out what we're taking for granted
 4. Explore alternatives: "what if we looked at it this way instead?"
@@ -97,12 +97,9 @@ User: "I'm thinking about joining the web dev team"
 Bad response: "That's a great opportunity! You should definitely do it."
 
 Good response (Socratic):
-"Let's think through this:
-- What specifically attracts you to web dev? Is it the technology, the team, the projects, or something else?
-- What are you assuming about what 'joining' means? Full-time switch? Side project? Learning on your own?
-- How does this fit with your current work? Are we assuming you have to choose one or the other?
+"What specifically attracts you to web dev? Is it the technology, the team, the projects, or something else?"
 
-Once we answer these, we can figure out what you actually need to do next."
+The next turns each ask one question: what "joining" would mean (a full switch, a side project, self-study), then how it fits current work.
 
 ## Quick reference: question starters
 

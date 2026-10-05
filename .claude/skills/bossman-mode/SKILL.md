@@ -63,7 +63,6 @@ These rules **remain active**:
 | `boil-the-lake` | Do it 100%. No half-measures. |
 | `writing-style` | Output quality stays high. |
 | `git-workflow` | Clean commits. |
-| `check-depended-by` | System integrity. |
 | `goal-contracts` | Every phase starts with a testable done-when and a verify surface. A budget cap is a stop-and-report state, not "done". |
 
 ---
@@ -430,19 +429,6 @@ Blockers: [none or list]
 
 ---
 
-## Growth path
-
-**Level 1 (now):** Single-phase execution with full agent team. Manual approval between phases. Orchestrator dispatches researchers, builders, judge, test writer. User reviews at checkpoints.
-
-**Level 2 (trust building):** Multi-phase execution. Ralph Loop keeps the orchestrator running between phases. Judge agent gates phase transitions instead of user approval for non-architectural phases. Sub-planners handle recursive decomposition of complex phases.
-
-**Level 3 (Cursor-scale):** Full autonomous multi-phase execution. Checkpoint files written to disk at each phase boundary. Morning summary of everything built, tested, and judged while user was away. Hundreds of builders if the codebase warrants it. Fresh-start pattern: stuck agents get killed and restarted with clearer prompts rather than debugged in-place.
-
-**Level 4 (multi-team):** `TeamCreate` + `SendMessage` for persistent named teammates across repos (gastown, gsd, gsd-2). Each team has its own orchestrator running its own research/build/judge cycle. A meta-orchestrator coordinates between teams at phase boundaries. Useful when the project spans different tech stacks, repos, or deployment targets.
-
-## Design inspiration
-
-Architecture inspired by Cursor's [Scaling long-running autonomous coding](https://cursor.com/blog/scaling-agents) post: strict planner/worker separation, single judge over multiple QA roles, workers that don't coordinate with each other, recursive sub-planning, and the principle that simpler systems outperform complex ones. Adapted for Claude Code's agent dispatch model and single-phase-at-a-time execution.
 
 ## Shortcuts to resist
 

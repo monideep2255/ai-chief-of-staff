@@ -70,7 +70,7 @@ Never compare a pass@5 from one harness to a pass@3 from another, or to a single
 | Type | How it works | When to use |
 |------|-------------|-------------|
 | **Code-based** | Deterministic check (regex, AST parse, lint) | Syntax, structure, valid output |
-| **Model-based** | Claude judges Claude's output | Semantic correctness, style, completeness |
+| Model-based | A different model from the one being graded judges the output | Semantic correctness, style, completeness |
 | **Human** | Flagged for manual review | Edge cases, subjective quality |
 
 ### Outcome buckets: pass, fail, abstain

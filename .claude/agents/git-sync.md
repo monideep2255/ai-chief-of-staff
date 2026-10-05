@@ -48,7 +48,7 @@ git push
 
 ### Full sync (pull then push)
 1. Pull latest changes first
-2. Stage all changes
+2. Stage each concern's files by path
 3. Commit with descriptive message
 4. Push to origin
 

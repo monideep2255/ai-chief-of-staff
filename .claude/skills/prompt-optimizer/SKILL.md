@@ -56,21 +56,12 @@ with a detailed commit message
 
 ### 1. file loading patterns
 
-**Anti-pattern: Pre-loading with `@` mentions**
-```
-❌ "@file1.md @file2.md @file3.md Review these and create a skill"
-   Cost: ~2,000-8,000 tokens (loads entire files)
+An `@` mention is the right tool when the files are known and the task will read them: it attaches each file once, at a stable place in the prefix, and costs less than a search that rediscovers the same files. It wastes tokens when a prompt attaches files the task never reads, or a large file of which only a slice matters.
 
-✅ "Create a skill by analyzing files in the visualizations/ folder"
-   Cost: ~500 tokens (I read only what I need)
-
-Savings: ~1,500-7,500 tokens (60-90%)
-```
-
-**Rule:**
-- If `@` mentions > 1 file: Suggest folder pattern or let me explore
-- If `@` mentions large files (>500 lines): Always suggest removal
-- If user needs specific files: Suggest reading during execution
+Rule:
+- Keep `@` mentions for files the task will certainly use.
+- For a large file where only one section matters, name the section or ask for a grep first.
+- For files the task may not need, drop the mention and name the folder or topic so the agent searches instead.
 
 ### 2. sequential vs parallel execution
 
@@ -152,6 +143,15 @@ Savings: ~90 tokens (I already know the project context)
 - Remove file locations I can find (use Glob/Grep)
 - Remove standards I already follow
 
+### 6. dated prompt patterns
+
+Check the prompt for text written for older models, because on current models it over-applies:
+- Capitalized emphasis (MUST, NEVER, CRITICAL) with no stated reason: state the constraint plainly and give the reason.
+- "Think step by step" or "plan before acting": remove it, since thinking depth is set by the effort setting and not by prose.
+- Numbered choreography for a judgment task: state the outcome, the constraints, and how to verify, and keep numbered steps only where order matters.
+- Hard word or item caps: say who reads the output and what they need.
+- Long prohibition lists: state the goal, and keep a prohibition only when its failure still happens or it encodes a real policy.
+
 ## Optimization output format
 
 When analyzing a prompt, provide:
@@ -209,28 +209,28 @@ Breakdown:
 
 ## Examples
 
-### Example 1: file-heavy prompt
+### Example 1: unneeded files
 
-**Original:**
+Original:
 ```
 @docs/architecture/ARCHITECTURE.md @docs/schema/SCHEMA.md
-@visualizations/DIAGRAMS.md Review all these architecture files
-and create a comprehensive summary document
+@visualizations/DIAGRAMS.md @docs/archive/OLD_NOTES.md Review all these
+architecture files and create a comprehensive summary document
 ```
 
-**Analysis:**
+Analysis:
 ```
-📊 Issues:
-- 🔴 3 large files (~6,000 tokens loaded)
-- 🟢 "comprehensive" is vague
+Issues:
+- OLD_NOTES.md is attached but the task does not need it
+- "comprehensive" is vague
+- The other three files are known and needed, so their mentions stay
+```
 
-Savings: ~6,000 tokens (92%)
+Optimized:
 ```
-
-**Optimized:**
-```
-Create architecture summary from docs/architecture/, docs/schema/,
-and visualizations/ folders
+@docs/architecture/ARCHITECTURE.md @docs/schema/SCHEMA.md
+@visualizations/DIAGRAMS.md Summarize how these three fit together in one
+document for a new engineer
 ```
 
 ### Example 2: sequential agent tasks
@@ -304,24 +304,9 @@ Savings: ~150 tokens (70%)
 Create database schema diagram showing all relationships
 ```
 
-## Token savings calculator
+## Estimating savings
 
-Use this mental model to estimate savings:
-
-```
-@ mention (large file):     ~2,000 tokens each
-@ mention (medium file):    ~1,000 tokens each
-@ mention (small file):     ~300 tokens each
-Verbose phrasing:           ~100-200 tokens
-Background execution:       ~2,000-5,000 tokens (long tasks)
-Parallel execution:         ~20-30% time (same tokens)
-Redundant context:          ~100-500 tokens
-```
-
-**Threshold for suggesting optimization:**
-- Savings > 3,000 tokens: **Strongly recommend**
-- Savings 1,000-3,000: **Recommend**
-- Savings < 1,000: **Optional** (mention briefly)
+Do not quote token figures as fact. A file's real cost is its size, which `/context` shows, so measure it. State savings qualitatively (large, moderate, small) and name the cause: attached files the task never reads, background the project instructions already hold, or sequential steps that could run together. Background execution saves the user's waiting time, not tokens. Recommend an optimization when it changes cost or time in a way the user would notice, and mention smaller ones briefly.
 
 ## Integration with other skills
 
@@ -345,59 +330,6 @@ When user invokes `/optimize [prompt]`:
 4. **Explain** changes and savings
 5. **Ask** for user confirmation
 6. **Execute** if user accepts (Y)
-
-**For Users:**
-Use this skill when:
-- Prompt feels long or complex
-- Using multiple @ mentions
-- Chaining multiple agent tasks
-- Running tests, builds, or deployments
-- Learning optimal prompting patterns
-
-**Skip this skill when:**
-- Prompt is already short (<50 words)
-- Single simple task
-- No @ mentions
-- Quick edits
-
-## Success metrics
-
-Track these over time:
-- Average tokens per task (should decrease)
-- Token savings per optimization (aim for >3,000)
-- User acceptance rate (aim for >80%)
-- Optimization invocation frequency (should decrease as user learns)
-
-**Goal:** After 10-20 optimizations, user internalizes patterns and rarely needs this skill.
-
-## Advanced patterns
-
-### Pattern 1: multi-agent orchestration
-```
-❌ "Run agent1, wait, then agent2, wait, then agent3"
-✅ "Run agent1, agent2, and agent3 in parallel"
-```
-
-### Pattern 2: exploration vs specification
-```
-❌ "Read @file1, @file2, @file3 to find X"
-✅ "Search for X in project/" (I'll use Grep/Glob)
-```
-
-### Pattern 3: background + foreground mix
-```
-❌ "Run tests and update docs"
-✅ "Run tests in background, update docs now"
-   (Parallel work: tests run while docs update)
-```
-
-### Pattern 4: conditional optimization
-```
-If (file_mentions > 1) → Suggest folder pattern
-If (task_time > 2min) → Suggest background
-If (independent_steps > 1) → Suggest parallel
-If (verbosity > 100_words) → Suggest simplification
-```
 
 ## Meta: when NOT to optimize
 
@@ -436,7 +368,7 @@ This reinforces learning for future prompts.
 
 Done when all of these are true:
 
-- [ ] Prompt analyzed across the 5 framework dimensions
+- [ ] Prompt analyzed across the 6 framework dimensions
 - [ ] Inefficiencies identified with token estimates
 - [ ] Optimized prompt generated
 - [ ] Changes explained with a savings breakdown

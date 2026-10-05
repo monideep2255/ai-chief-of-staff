@@ -50,7 +50,7 @@ Before touching anything, ask: *what exactly changed?* Then update only the sect
 
 ### Phase 1: triage (what changed?)
 
-Run `git diff --name-only HEAD~1` (or `git status --short` if uncommitted changes exist) to get the list of changed files. **Do not read any doc files yet.**
+The caller supplies the list of changed files, taken from `git diff --name-only HEAD~1` or `git status --short`, because this agent has no shell. If no list was supplied, ask the caller for it. Do not read any doc files yet.
 
 ### Phase 2: map changes to affected docs
 
@@ -135,11 +135,11 @@ Never report success on an intended change you did not confirm by re-reading the
 
 Say exactly what lines changed and why, and include the Phase 4.5 verification table. Your report must never be empty: if you made zero changes, state that explicitly and why. An empty or missing report is treated as a failed run.
 
-Push only when you made at least one change. No changes → no push.
+This agent never commits or pushes. The caller runs `git-sync` after your report.
 
-## Speed rules (CRITICAL)
+## Speed rules
 
-- **Never read all 8 doc files.** Only read the ones the routing table says are affected.
+- Read only the doc files the routing table marks as affected, not all of them.
 - **Never do this:** Read one file → update it → read the next. That is sequential and slow.
 - **Parallel everything**  -  Reads and writes that are independent must happen in the same message.
 - **Skip trivial changes**  -  Minor fixes (typos, formatting, single-line syntax fixes) in content files do NOT need CHANGELOG or README entries unless they are part of a larger change.
@@ -221,7 +221,7 @@ Updated documentation:
 - [file]: [exactly what line/section changed]
 ...
 
-Pushing to GitHub.
+Ready for git-sync.
 ```
 
 **If no changes needed:**
@@ -242,5 +242,5 @@ Docs are already current. Nothing to update. No push.
    - `CHANGELOG.md`: One row per change. Recent Updates in README.md: last 7 entries only.
    - `GROWTH_SYSTEM.md`: Architecture + decision points. No skill/agent listings (those live in .claude/README.md).
    - If a section grows beyond a table, it belongs in its own file, not in an index.
-6. **Only push when something changed**  -  No changes → no push.
+6. Leave git to git-sync: this agent has no shell and never commits or pushes.
 7. **Don't delete files or folders without explicitly informing the user first.**

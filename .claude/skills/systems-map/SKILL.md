@@ -704,7 +704,7 @@ Run these before delivering the final HTML. Every item must pass.
 
 1. Every building block's expanded section has at least 2 data points with inline source links
 2. The mermaid diagram matches the connections described in each card's "Feeds into / Receives from" text (no orphan arrows, no missing connections)
-3. At least 2 connections were added or corrected during the Challenge phase (if none changed, the research wasn't challenging enough)
+3. Every connection added or corrected during the Challenge phase is recorded. If none changed, the report says what was searched and why the model held up
 4. The Sources section lists every URL consulted, grouped by building block (no ungrouped URLs, no missing blocks)
 5. Building block count is between 8 and 12 (fewer means the system is underspecified, more means it needs merging)
 
@@ -716,7 +716,7 @@ Done when all of these are true:
 - [ ] 8-12 building blocks proposed, user confirmed structure (Phase 1, Step 3)
 - [ ] Draft HTML generated and user reviewed in browser (Phase 2)
 - [ ] Web research completed for every building block with all URLs recorded (Phase 3, Step 1)
-- [ ] At least 2 connections added or corrected from research findings (Phase 3, Step 2-3)
+- [ ] Connections added or corrected from research findings are recorded, or the report states that none changed (Phase 3, Steps 2 and 3)
 - [ ] Final HTML has: expanded sections with 2+ data points per block, updated mermaid diagram, complete sources section (Phase 4)
 - [ ] All quality checks pass: inline source links, diagram matches card connections, sources grouped by block, 8-12 blocks (Quality checks)
 - [ ] Book inventory check was run and user confirmed (per book-inventory-check rule)

@@ -25,7 +25,7 @@ depended_by:
 
 # /os-maintain
 
-Auto-maintain all downstream documentation when system components change. Three modes:
+Auto-maintain all downstream documentation when system components change. Four modes:
 
 - `/os-maintain` - detect changes, walk dependencies, update all indexes
 - `/os-maintain .claude/rules/my-rule.md` - target a specific file
@@ -112,13 +112,13 @@ Update all stale files in a SINGLE message with parallel Edit calls. Surgical re
 
 ### Phase 6: count verification
 
-Do not eyeball counts from a memorized list of files. Run the script. It greps every live index doc (CLAUDE.md, AGENTS.md, README.md, SYSTEM_OVERVIEW.md, EXTENSIONS.md, .claude/README.md) for rule/skill/agent/hook counts in prose, tables, "Name (N)" labels, and mermaid count nodes, then diffs against the on-disk count. This replaces the old two-file checklist, which silently missed count locations the author had not listed (it missed SYSTEM_OVERVIEW's mermaid diagrams and ToC anchor on June 22).
+Do not eyeball counts from a memorized list of files. Run the script. It greps every live index doc (CLAUDE.md, AGENTS.md, README.md, SYSTEM_OVERVIEW.md, EXTENSIONS.md, .claude/README.md) for rule/skill/agent/hook counts in prose, tables, "Name (N)" labels, and mermaid count nodes, then diffs against the on-disk count.
 
 ```bash
 bash .claude/scripts/verify_counts.sh
 ```
 
-Exit 0 means all counts match. Exit 1 prints each drifted file and the offending text. Fix every flagged line, then re-run until exit 0. These are trivial edits that prevent count drift (the most common retro finding, flagged 3 of 4 retros).
+Exit 0 means all counts match. Exit 1 prints each drifted file and the offending text. Fix every flagged line, then re-run until exit 0. These are trivial edits that prevent count drift.
 
 The script covers the four component totals. It does not check mermaid count nodes or ToC anchors that the keyword patterns miss, so also eyeball these by hand in SYSTEM_OVERVIEW.md when any count changed: the Layer-1 and Layer-2 mermaid nodes (`H["N hook scripts"]`, `R["N behavioral rules"]`), the section headers (`### 3a. Rules (N)`), and the matching ToC anchors (`#3a-rules-N`). The anchor must match the header number or the link breaks.
 
@@ -257,7 +257,7 @@ cp .claude/rules/<selected>.md $REPO/.claude/rules/
 
 Use Write tool (not cp) for skills and agents - sandbox blocks Bash cp to `.claude/` subdirs even in child paths. Read each file first, then Write with cleaned frontmatter:
 
-- Keep: name, description, scope, argument-hint, user_invocable, tools, model, alwaysApply, globs
+- Keep: name, description, scope, argument-hint, user_invocable, tools, model, alwaysApply, paths
 - Filter depends_on: drop project-specific paths (Work/, Automations/, Forge/, CLAUDE.md, AGENTS.md)
 - Reset depended_by: []
 
@@ -300,7 +300,7 @@ Write all four in parallel:
 - Build order (phases in sequence)
 - Sub-agents table
 - Skills table
-- Key rules (which of the 14 matter most for this stack)
+- Key rules (which rules matter most for this stack)
 - Git workflow note
 - Cost targets if relevant
 
@@ -400,8 +400,6 @@ Agents (N total):
   untagged: N  [names]
 
 Hooks (N total): all project-specific by design
-
-Untagged components will be skipped by --export.
 ```
 
 Do not apply tags. Report only.

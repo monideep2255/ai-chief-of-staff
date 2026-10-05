@@ -60,7 +60,7 @@ curl -s -X POST https://api.firecrawl.dev/v1/scrape \
 
 Only scrape URLs that will add material depth. Do not scrape all results.
 
-For JavaScript-heavy pages (SPAs, dashboards), Firecrawl handles rendering. For simple static pages, the `fetch` MCP is sufficient.
+For JavaScript-heavy pages (SPAs, dashboards), Firecrawl handles rendering. For simple static pages, WebFetch is sufficient.
 
 ### Step 3: synthesize
 
@@ -73,14 +73,13 @@ After gathering sources:
 
 ## Setup requirements
 
-API keys are set up on first use, not in advance. When this skill is invoked:
+Firecrawl is optional. Before a scrape step, check that the key exists without printing it:
 
-1. Check if `TAVILY_API_KEY` is set: `echo $TAVILY_API_KEY`
-2. If missing, prompt the user: "Tavily API key not set. Get a free key at tavily.com, then run: `export TAVILY_API_KEY=\"tvly-...\"`  — add to ~/.zshrc to persist."
-3. Check if `FIRECRAWL_API_KEY` is set before any scrape step: `echo $FIRECRAWL_API_KEY`
-4. If missing, prompt the user: "Firecrawl API key not set. Get a free key at firecrawl.dev, then run: `export FIRECRAWL_API_KEY=\"fc-...\"`  — add to ~/.zshrc to persist."
+```bash
+[ -n "$FIRECRAWL_API_KEY" ] && echo "set" || echo "not set"
+```
 
-This lazy setup pattern also surfaces how often research tasks come up — each prompt is a data point on actual usage before committing to a paid plan.
+If it is not set, use WebFetch for that URL. To enable Firecrawl, get a free key at firecrawl.dev and export `FIRECRAWL_API_KEY` in `~/.zshrc`. Never echo or paste the key value.
 
 ## Fallback behavior
 
@@ -98,7 +97,6 @@ Before returning research:
 - [ ] At least 2 independent sources for any factual claim
 - [ ] No SEO-farm content (check: domain authority, specific vs vague claims)
 - [ ] Sources dated within the last 12 months for fast-moving topics (AI, tools)
-- [ ] Tavily's pre-synthesized answer cross-checked against the raw source URLs
 
 ## Exit checklist
 

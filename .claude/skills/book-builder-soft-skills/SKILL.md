@@ -75,14 +75,14 @@ Present the proposed table of contents to the user. Ask: "Does this structure lo
 ```
 Learning/soft-skills/<topic-name>/
 ├── README.md
-├── Part_1_<Part_Name>/
-│   ├── 01_<Chapter_Title>.md
-│   ├── 02_<Chapter_Title>.md
-├── Part_2_<Part_Name>/
-│   ├── 03_<Chapter_Title>.md
+├── part-1-<part-name>/
+│   ├── 01-<chapter-title>.md
+│   ├── 02-<chapter-title>.md
+├── part-2-<part-name>/
+│   ├── 03-<chapter-title>.md
 ```
 
-Use underscores in filenames. Zero-padded two-digit chapter numbers.
+Use lowercase hyphenated names for folders and files. Zero-padded two-digit chapter numbers.
 
 ### Step 5: write the readme.md
 
@@ -92,7 +92,7 @@ Reference: use the README format from `book-builder-hard-skills` (title, how to 
 
 ### Step 6: write each chapter
 
-Every chapter MUST follow this template:
+Every chapter follows this template:
 
 ```markdown
 # Chapter n: <title>
@@ -153,7 +153,7 @@ Rate yourself 1-5 on each (1 = never do this, 5 = do this consistently):
 [2-3 practical bullet points. One specific action to take this week. Bridge to next chapter.]
 ```
 
-### Step 7: writing rules (CRITICAL)
+### Step 7: writing rules
 
 **Language:**
 - No jargon without immediate definition

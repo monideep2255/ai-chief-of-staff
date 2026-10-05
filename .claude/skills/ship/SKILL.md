@@ -71,7 +71,7 @@ All three passes skip symlinked directories, which keeps the walk out of any ext
 After the cleanup, use the `git-sync` sub-agent to commit and push.
 
 Read `.claude/agents/git-sync.md` for the full agent instructions. Key points:
-1. `git add` all changed files
+1. `git add` each concern's files by path, one commit per concern
 2. Show the user what's being committed
 3. Commit with a clear, descriptive message
 4. **NEVER add Co-Authored-By lines**
