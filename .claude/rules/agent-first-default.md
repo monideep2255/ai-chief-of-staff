@@ -1,7 +1,6 @@
 ---
 description: "Default to agent-first-draft on reversible (two-way door) tasks, stay hands-on on irreversible (one-way door) ones."
 scope: project
-alwaysApply: true
 depends_on:
   - .claude/rules/preserve-your-thinking.md
   - .claude/rules/boil-the-lake.md

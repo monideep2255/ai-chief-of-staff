@@ -58,6 +58,10 @@ git pull origin main           # clean fast-forward (sandbox off)
 
 This recovery is safe only when the tree was clean before the pull, so confirm that first (`git status --short` empty at the start). `reset --hard` and `clean` discard uncommitted work, so if the pre-pull tree held real local edits, stash them instead. Before assuming the incoming "deletions" are real, read what the commits actually do (`git diff --stat <old> origin/main`): a folder reorganization shows as `rename ... (100%)`, not a delete, so nothing is lost. Prove the result the same way as a push: `git rev-parse HEAD origin/main` must match and `git status --short` must be empty.
 
+### The untrack trap
+
+A pull of a commit that stops tracking files (for example a "keep local only" change that adds a folder to `.gitignore` and runs `git rm --cached`) deletes this machine's copies of those files, because git removes what the incoming commit no longer tracks. Check first with `git diff --name-status HEAD origin/main` and look for `D` lines whose paths the incoming `.gitignore` now ignores. Before pulling, back them up with `git archive <old HEAD> <paths> | tar -x -C <backup dir>`, pull, then copy them back. They stay local and untracked, which is what the commit intended.
+
 ### Prove the fix, do not assert it
 
 After a durable fix, verify with evidence from the actual command path, not a claim that it works. For a push over HTTPS, the proof is that the remote actually advanced: push, then compare the local and remote commit hashes.

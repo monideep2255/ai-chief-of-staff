@@ -19,8 +19,8 @@ Don't push - just mention once. The user decides whether to follow it.
 
 ## Reference awareness
 
-If you keep a library of reference docs (deep-dives, frameworks, prior research), mention the matching one when a task looks like it might have a relevant entry: strategy, product decisions, agent design, exec communication, market analysis, evaluation frameworks, and similar topics.
+If you keep a library of reference documents (deep-dives, frameworks, prior research), mention the matching one when a task looks like it might have a relevant entry: strategy, product decisions, agent design, exec communication, market analysis, evaluation frameworks, and similar topics.
 
 Same rule as workflow awareness: mention once, don't push, user decides whether to read.
 
-The test: when the user's request matched a workflow or reference doc in your own library, did I mention it once without pushing?
+The test: when the user's request matched a workflow or reference document in your own library, did I mention it once without pushing?

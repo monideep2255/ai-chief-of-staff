@@ -21,7 +21,7 @@ depended_by:
 
 ## Workflow and reference awareness
 
-When a user request matches a workflow or reference doc in your own reference-doc library (if you've built one), mention it once. Don't push. The lookup tables are in `.claude/rules/workflow-and-reference-awareness.md` (loaded only when touching those folders or on strategy/planning tasks).
+When a user request matches a workflow or reference document in your own reference-document library (if you've built one), mention it once. Don't push. The lookup tables are in `.claude/rules/workflow-and-reference-awareness.md` (loaded only when touching those folders or on strategy/planning tasks).
 
 ## Before major interactions
 

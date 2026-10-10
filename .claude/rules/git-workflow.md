@@ -10,6 +10,7 @@ depended_by:
   - .claude/rules/pause-before-acting.md
   - .claude/README.md
   - .claude/agents/git-sync.md
+  - .claude/agents/code-reviewer.md
 ---
 
 ## Git workflow

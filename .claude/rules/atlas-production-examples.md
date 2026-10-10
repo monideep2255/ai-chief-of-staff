@@ -5,6 +5,7 @@ depends_on:
 depended_by:
   - CLAUDE.md
   - .claude/README.md
+  - .claude/agents/code-reviewer.md
 ---
 
 ## Atlas production examples

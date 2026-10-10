@@ -16,7 +16,7 @@ Use sentence case, the same rules as headings. Capitalize only the first word, p
 
 | Type | Format | Example |
 |------|--------|---------|
-| Meeting notes (simple) | `Month_Day.md` | `January_06.md` |
+| Meeting notes (simple) | `Month_Day.md`, only inside a folder named for the person or team | `Check-in with Priya/January_06.md` |
 | Meeting notes (numbered) | `{number}_Meeting:{topic} {Month} {Day}.md` | `2_Meeting:technical_refinement_January_20.md` |
 | Meeting notes (person) | `{number}_Meeting_{Person}_{Month}_{Day}.md` | `2_Meeting_Priya_January_22.md` |
 | Meeting prep | `Prep_for_{Month}_{Day}.md` | `Prep_for_January_20.md` |
@@ -36,4 +36,6 @@ Does not trigger:
 - Writing code files (.py, .js, .ts, etc.), which follow the language's conventions
 - Commit messages, CHANGELOG entries, or inline comments
 
-The test: does every file I created match its type's format in the table, using sentence case and underscores between words?
+A date alone does not survive contact with a folder of twenty meetings, so a `Month_Day.md` meeting file names the person or team through the folder that holds it.
+
+The test: does every file I created match its type's format in the table, using sentence case and underscores between words, and does every `Month_Day.md` meeting file sit in a folder named for the person or team?

@@ -257,7 +257,7 @@ cp .claude/rules/<selected>.md $REPO/.claude/rules/
 
 Use Write tool (not cp) for skills and agents - sandbox blocks Bash cp to `.claude/` subdirs even in child paths. Read each file first, then Write with cleaned frontmatter:
 
-- Keep: name, description, scope, argument-hint, user_invocable, tools, model, alwaysApply, paths
+- Keep: name, description, scope, argument-hint, user_invocable, tools, model, paths
 - Filter depends_on: drop project-specific paths (Work/, Automations/, Forge/, CLAUDE.md, AGENTS.md)
 - Reset depended_by: []
 

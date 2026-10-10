@@ -110,6 +110,8 @@ A cost or speed comparison between two systems or two models is meaningless unle
 
 The honest baseline is the more rigorous option, not a cheaper lower-rigor one. If one arm is expected to check every fact against two sources and the other checks against one, or skips the check, the two are not comparable until both are held to the stricter rule. Source: the plan-big-execute-small repository dive, where a solo control run had to be prompt-forced to match a team's two-sources-per-fact standard before its bill meant anything as a comparison.
 
+Count the whole bill, not only the model tokens. When an arm calls a helper tool that bills on its own (a judgment API, a reranker, a hosted search), add that tool's charges to the arm's cost and report each component separately: model tokens, each helper tool, infrastructure. A cost that could not be measured is reported as unknown, never as zero, because an unknown cost read as zero makes the tool-assisted arm look cheaper than it is. Source: the jevgrep repository dive, applied after an A/B comparison where hundreds of billed helper-tool calls sat outside the token count.
+
 ### Measured versus projected
 
 A figure after a fix is a measurement only when the frozen case set was rerun through the change that actually shipped. Anything else is a projection, and it is written as one.

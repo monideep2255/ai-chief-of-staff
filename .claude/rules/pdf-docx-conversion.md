@@ -23,6 +23,6 @@ When you encounter a `.pdf` or `.docx` file in the workspace (during file listin
 4. Convert to markdown following the repo's writing style (sentence case headings, no em dashes, etc.) and file naming conventions.
 5. After successful conversion, ask if the user wants the original PDF/DOCX deleted.
 
-Do NOT auto-convert without asking. The user decides.
+Do NOT auto-convert without asking. The user decides. Exception: inside `ingest-workflows`, converting inbox files is the skill's job and deleting a verified converted original is a standing authorization (the 2026-08-15 row in `file-protection.md`), so do not ask there.
 
 The test: did I ask and wait for explicit confirmation before converting a PDF or DOCX, and report what content I could not preserve?

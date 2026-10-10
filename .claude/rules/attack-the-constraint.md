@@ -12,7 +12,7 @@ depended_by:
 
 Before optimizing, automating, or adding to any system, ask: what is the bottleneck right now?
 
-Optimizing a non-bottleneck is wasted effort. Elon's version: "Attack the constraint" - find what's actually limiting throughput and focus resources there.
+Work on a non-bottleneck is wasted effort. Elon's version: "Attack the constraint" - find what's actually limiting throughput and focus resources there.
 
 The question to ask:
 

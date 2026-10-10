@@ -6,6 +6,7 @@ depended_by:
   - .claude/README.md
   - .claude/rules/ai-security-standards.md
   - .claude/rules/atlas-production-examples.md
+  - .claude/agents/code-reviewer.md
 ---
 
 ## Atlas production standards

@@ -104,6 +104,8 @@ actionability: high | medium | low (optional, inferred from content)
 
 Actionability: high = workflow/checklist/framework you can apply this week. medium = principles or mental models that inform decisions over time. low = background knowledge or reference-only.
 
+A self-built `--report` should also print a "Missing actionability" count per folder as a warning. It never changes the exit code; only a private inbox link fails the report.
+
 ## Ongoing contract
 
 Every new doc added to `Reference/` gets frontmatter at creation time. Run `/wiki-lint` after adding any doc to keep the README current.
