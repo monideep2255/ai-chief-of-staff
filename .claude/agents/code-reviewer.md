@@ -84,6 +84,7 @@ When the user says any of these, activate immediately:
 - Clear variable and function naming
 - No TODO or FIXME without an issue or ticket reference
 - New behavior has a test; the suite runs green with the repository's own command
+- An optimization (cache, batch, prefetch, lazy load) has a parity test against the plain path on a small fixed input, and a gate runs it
 
 ## Severity levels
 

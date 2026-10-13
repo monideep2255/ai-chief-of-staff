@@ -46,6 +46,7 @@ Read the repo thoroughly:
 - Key source files (entry points, core modules, config)
 - File tree structure
 - Examples/tests
+- Headline claims: for each number the repository advertises, name the dimension it leaves out (speed, cost, accuracy, disk, failure rate) and search for whether the repository measures that dimension anywhere. A missing measurement goes in the known gaps as a negative finding. Worked instance: AirLLM reports GPU memory for every model and speed for none.
 
 ### Step 3: generate two files
 
@@ -168,6 +169,7 @@ After generating both files, run these inline checks before reporting:
 - [ ] At least 1 comparison table in section 6
 - [ ] "What to skip" section actually skips things (not everything marked relevant)
 - [ ] Takeaways are specific (each has an "implication" sentence, not just a fact)
+- [ ] Every headline claim has its omitted dimension named, and an unmeasured one is listed as a negative finding
 
 **For system-upgrade-guide.md:**
 - [ ] All three buckets present (A already-in-OS, B new, C skipped)
