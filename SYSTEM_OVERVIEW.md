@@ -78,15 +78,15 @@ Each layer loads differently and answers a different question. Rules answer "wha
 
 A rule is a markdown file in `.claude/rules/` with YAML frontmatter. It loads in one of two ways.
 
-Always-on rules load at the start of every session, no matter what you are doing. Use this sparingly, for behavior that should never lapse: do not delete files without asking, write in plain language, ask one question at a time. The frontmatter marks this with `alwaysApply: true`.
+Always-on rules load at the start of every session, no matter what you are doing. Use this sparingly, for behavior that should never lapse: do not delete files without asking, write in plain language, ask one question at a time. A rule with no `paths:` field is always-on; that is the default.
 
-Glob-scoped rules load only when you touch a file matching a path pattern. A rule scoped to `Work/example-project/**` stays silent everywhere else in the repo and switches on the moment you open a file inside that folder. This is how project-specific standards, a security pattern, a framework convention, stay out of your way in unrelated work. The frontmatter carries a `globs` array instead of `alwaysApply: true`.
+Glob-scoped rules load only when you touch a file matching a path pattern. A rule scoped to `Work/example-project/**` stays silent everywhere else in the repo and switches on the moment you open a file inside that folder. This is how project-specific standards, a security pattern, a framework convention, stay out of your way in unrelated work. The frontmatter carries a `paths:` list of glob patterns. Claude Code reads only `paths:`; `globs:` and `alwaysApply:` are ignored, so a rule that uses them loads on every turn.
 
 ```yaml
 ---
 description: "What this rule enforces"
-alwaysApply: true
-globs: ["Work/example-project/**"]   # omit when alwaysApply is true
+paths:                       # omit for an always-on rule
+  - "Work/example-project/**"
 ---
 ```
 

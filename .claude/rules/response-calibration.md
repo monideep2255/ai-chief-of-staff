@@ -1,7 +1,6 @@
 ---
 description: "Response calibration: plain first-principles language, right-sized answers, no filler"
 scope: portable
-alwaysApply: true
 depends_on:
   - .claude/agents/first-principles.md
   - .claude/rules/communication-style.md

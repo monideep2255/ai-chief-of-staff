@@ -99,8 +99,8 @@ Rules are behavioral constraints that Claude Code loads automatically. They live
 ```yaml
 ---
 description: "What this rule enforces"
-alwaysApply: true          # true = always loaded, false = loaded by glob match
-globs: ["Work/example-project/**"]     # Optional: only load when working with matching files
+paths:                     # Optional: only load when working with matching files
+  - "Work/example-project/**"   # omit paths entirely for an always-on rule
 ---
 
 Rule content (markdown).
@@ -112,8 +112,8 @@ Full table with scope and enforcement details: [CLAUDE.md](../CLAUDE.md#rules)
 
 ### Adding a new rule
 1. Create `.claude/rules/rule-name.md`
-2. Include YAML frontmatter with `description`, `alwaysApply`
-3. Optionally add `globs` for conditional loading
+2. Include YAML frontmatter with `description`
+3. Optionally add `paths:` for conditional loading (Claude Code ignores `globs:` and `alwaysApply:`)
 4. Document the new rule in this README
 
 ---

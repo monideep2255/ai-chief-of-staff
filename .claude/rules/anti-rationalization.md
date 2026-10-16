@@ -1,6 +1,5 @@
 ---
 description: Block the LLM from rationalizing away steps in multi-step skills by naming common shortcuts and countering them
-alwaysApply: true
 depends_on:
   - .claude/skills/
 depended_by:

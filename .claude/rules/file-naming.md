@@ -1,7 +1,6 @@
 ---
 description: "File naming conventions for meetings, prep docs, explanations, decisions, questions"
 scope: portable
-alwaysApply: true
 depends_on: []
 depended_by:
   - CLAUDE.md

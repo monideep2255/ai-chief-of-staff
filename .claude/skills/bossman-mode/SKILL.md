@@ -45,11 +45,13 @@ If any of these are missing, say: "We need [missing item] before entering bossma
 
 ## Behavioral overrides (active while in bossman mode)
 
-These rules are **suspended** during bossman mode execution:
+On activation, read `.claude/rules/bossman-mode.md`. Where it and the tables below differ, the rule wins.
+
+These rules are suspended during bossman mode execution:
 
 | Rule | Why suspended |
 |------|--------------|
-| `pause-before-acting` | Plan is already agreed. No need to pause and re-check. |
+| `pause-before-acting` step 2 only | Plan is agreed, so no clarification pause. The rank table in step 1 still applies. |
 | `preserve-your-thinking` | Decisions are made. This is execution, not deliberation. |
 | `clarify-before-drafting` | Scope is defined. No Socratic questioning mid-build. |
 
@@ -64,6 +66,9 @@ These rules **remain active**:
 | `writing-style` | Output quality stays high. |
 | `git-workflow` | Clean commits. |
 | `goal-contracts` | Every phase starts with a testable done-when and a verify surface. A budget cap is a stop-and-report state, not "done". |
+| `ai-security-standards` | Deploy, infrastructure, data deletion, access changes, and external sharing still need the owner's yes. |
+| `book-inventory-check` | The inventory gate is never suspended. |
+| No push | Never push to a remote without an explicit instruction. |
 
 ---
 

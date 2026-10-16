@@ -1,7 +1,6 @@
 ---
 description: "File protection: no deletion without asking, no unnecessary file creation, documentation repo only"
 scope: portable
-alwaysApply: true
 depends_on: []
 depended_by:
   - CLAUDE.md

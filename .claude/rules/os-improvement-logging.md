@@ -1,7 +1,6 @@
 ---
 description: "Log every adopted OS improvement to OS_IMPROVEMENTS.md. The user-facing record of how the personal OS evolves through pattern adoption."
 scope: portable
-alwaysApply: true
 depends_on: [OS_IMPROVEMENTS.md]
 depended_by:
   - CLAUDE.md

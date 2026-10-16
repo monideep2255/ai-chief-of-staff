@@ -2,7 +2,6 @@
 name: sandbox-diagnosis
 description: Before disabling the sandbox for a failed command, classify the failure (filesystem deny, Layer-7 HTTPS block, Layer-4 SSH) and apply the durable fix that keeps the security boundary intact
 scope: project
-alwaysApply: true
 depends_on:
   - .claude/rules/goal-contracts.md
   - .claude/rules/self-eval-loop.md

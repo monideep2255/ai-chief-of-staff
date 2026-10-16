@@ -1,7 +1,6 @@
 ---
 description: "Log heavyweight decisions to DECISIONS.md. Enforced automatically by docs-sync scanning for structural changes."
 scope: portable
-alwaysApply: true
 depends_on: [DECISIONS.md]
 depended_by:
   - CLAUDE.md

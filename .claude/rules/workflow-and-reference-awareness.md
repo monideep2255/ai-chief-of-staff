@@ -1,7 +1,8 @@
 ---
 description: "Mention a matching workflow or reference doc from your own library when a user request aligns with one"
 scope: project
-globs: ["Reference/**"]
+paths:
+  - "Reference/**"
 depends_on: []
 depended_by:
   - .claude/rules/communication-style.md

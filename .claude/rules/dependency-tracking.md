@@ -1,7 +1,6 @@
 ---
 description: "Dependency tracking: every component declares what it depends on and what depends on it, and you check before committing"
 scope: project
-alwaysApply: true
 depends_on: [DEPENDENCIES.md]
 depended_by: [CLAUDE.md, .claude/README.md]
 ---

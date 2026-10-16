@@ -1,8 +1,11 @@
 ---
 description: "Ask before converting PDFs/DOCX to markdown, verify content preservation"
 scope: project
-alwaysApply: false
-globs: ["**/*.pdf", "**/*.docx", "**/*.PDF", "**/*.DOCX"]
+paths:
+  - "**/*.pdf"
+  - "**/*.docx"
+  - "**/*.PDF"
+  - "**/*.DOCX"
 depends_on:
   - .claude/rules/writing-style.md
   - .claude/rules/file-naming.md

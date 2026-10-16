@@ -1,7 +1,6 @@
 ---
 description: "Git workflow: work on main, clear commits, no formal PR, gitignored paths"
 scope: portable
-alwaysApply: true
 depends_on:
   - .claude/agents/git-sync.md
   - .claude/rules/pause-before-acting.md

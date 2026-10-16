@@ -1,5 +1,6 @@
 ---
-globs: ["Work/example-project/**"]
+paths:
+  - "Work/example-project/**"
 depends_on: []
 depended_by:
   - CLAUDE.md
@@ -95,4 +96,4 @@ For a complete production readiness review, run a six-lens checklist covering se
 
 Full reference: your own dev-workflow standards doc, if you maintain one.
 
-The test: did I apply every security, supply-chain, secrets, multi-agent schema, and AI answer grounding gate including a published evaluation boundary before calling Atlas or agentic-search code production-ready?
+The test: did I apply every security, supply-chain, secrets, multi-agent schema, and AI answer grounding gate including a published evaluation boundary before calling Atlas code production-ready?

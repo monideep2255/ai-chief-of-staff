@@ -6,6 +6,7 @@ Running log of lessons learned from past runs. Separate from evals (static check
 
 | Date | Lesson | Source |
 |------|--------|--------|
+| 2026-10-16 | Give each audit worker the full search scope for existence checks. A workflows audit worker on a small model reported two referenced files as missing because it searched only the reference library; one lived under a project reference folder, and the other existed under its stated name. Tell workers to test a path with `git ls-files` across the whole repository before calling it missing. | Cycle 28 |
 | 2026-06-02 | Count drift (hardcoded counts in docs vs actual file counts) is the most common retro finding, flagged in 3 of 4 retros. os-maintain Phase 6 now handles this, but verify it ran. | Retro cycles 9-12 |
 | 2026-06-02 | During planned leave or extended time away, suppress work dormancy flags. The constraint is the leave itself, not a productivity gap. | Retro cycle 12 |
 | 2026-06-04 | Two-phase Curator pre-filter (deterministic staleness bucket before LLM review) reduces LLM decision surface. Only stale/archive-eligible skills go to LLM review. | Hermes pattern adoption |

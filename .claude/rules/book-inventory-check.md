@@ -1,7 +1,8 @@
 ---
 description: "Before creating any new book, show the full inventory of existing books and reading progress. Prevents accumulation of unread material."
 scope: project
-globs: ["Learning/**"]
+paths:
+  - "Learning/**"
 depends_on:
   - Learning/
 depended_by:

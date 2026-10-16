@@ -1,11 +1,11 @@
 ---
 description: "Autonomous execution mode - suspends deliberation rules when bossman mode is active"
-globs: ["!*"]
 depends_on:
   - .claude/skills/bossman-mode/SKILL.md
 depended_by:
   - CLAUDE.md
   - .claude/README.md
+  - .claude/skills/bossman-mode/SKILL.md
 ---
 
 ## Bossman mode rule
@@ -50,7 +50,8 @@ Allow:
 Ask:
 - Architecture-level changes that contradict the agreed plan
 - Anything that affects phases beyond the current one
-- Deleting files or reverting prior work
+- File deletion or a revert of prior work
+- Deploy, infrastructure changes, data deletion, access changes, or external sharing (the human approval in `ai-security-standards.md` is never suspended)
 
 Deny:
 - Proceeding to the next phase without user approval

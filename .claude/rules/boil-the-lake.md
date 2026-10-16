@@ -1,7 +1,6 @@
 ---
 description: "When AI makes a task cheap, do it 100% instead of 80%. Completeness over shortcuts."
 scope: portable
-alwaysApply: true
 depends_on: []
 depended_by:
   - CLAUDE.md

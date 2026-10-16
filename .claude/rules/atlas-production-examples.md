@@ -1,5 +1,6 @@
 ---
-globs: ["Work/example-project/**"]
+paths:
+  - "Work/example-project/**"
 depends_on:
   - .claude/rules/atlas-production-standards.md
 depended_by:
@@ -185,6 +186,6 @@ deny  = ["Bash(rm *)", "Bash(curl *)", "Bash(* | sh)", "Bash(*&&*)", "Bash(*;*)"
 - Deny rules must be checked against every command segment (split on `&&`, `||`, `;`, `|`) and the whole string, and deny always wins over allow. A narrow allow is only safe when paired with denies that catch chaining and the specific destructive commands.
 - When you build the gate yourself, split the command on chain operators and validate each segment against the allowlist, not just the leading token. Reject the whole command if any segment fails.
 
-Real-world source: this exact asymmetry has shown up in coding-agent permission engines, where deny and ask rules match per segment but allow rules match only the whole string, so `Bash(git *)` approves `git status && rm -rf /`. Any agentic-search shell allowlist inherits this trap.
+Real-world source: this exact asymmetry has shown up in coding-agent permission engines, where deny and ask rules match per segment but allow rules match only the whole string, so `Bash(git *)` approves `git status && rm -rf /`. Any Atlas shell allowlist inherits this trap.
 
 The test: does my code pass user input directly to SQL, HTTP responses, URLs, or log messages without sanitization, and does my shell allowlist validate every chained segment rather than just the leading command?

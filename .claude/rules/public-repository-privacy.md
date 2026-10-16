@@ -1,7 +1,6 @@
 ---
 description: "Public repository privacy: what never gets committed, how to commit safely, and what to do if something slips"
 scope: portable
-alwaysApply: true
 depends_on:
   - .claude/rules/git-workflow.md
   - .claude/rules/file-protection.md

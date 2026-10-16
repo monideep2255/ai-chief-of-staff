@@ -2,7 +2,17 @@
 name: supply-chain-security
 description: Before installing or recommending any package (npm, PyPI, MCP server), run checks to catch supply chain attacks, malicious versions, and postinstall script exploits.
 scope: portable
-globs: ["**/package.json", "**/package-lock.json", "**/node_modules/**", "**/requirements*.txt", "**/pyproject.toml", "**/setup.py", "**/Pipfile", "**/.mcp.json", "**/mcp.json", "**/claude_desktop_config.json"]
+paths:
+  - "**/package.json"
+  - "**/package-lock.json"
+  - "**/node_modules/**"
+  - "**/requirements*.txt"
+  - "**/pyproject.toml"
+  - "**/setup.py"
+  - "**/Pipfile"
+  - "**/.mcp.json"
+  - "**/mcp.json"
+  - "**/claude_desktop_config.json"
 depends_on: []
 depended_by:
   - CLAUDE.md

@@ -1,7 +1,6 @@
 ---
 description: "Meridian AI security non-negotiables for all code and agent work, distilled from the AppSec agentic AI security page tree. Treat AI output as untrusted, sandbox execution, protect secrets, require human approval for high-risk actions."
 scope: portable
-alwaysApply: true
 depends_on:
   - .claude/rules/atlas-production-standards.md
 depended_by:

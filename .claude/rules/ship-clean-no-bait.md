@@ -1,7 +1,6 @@
 ---
 description: "Once work is declared done it must be done and clean. No trickling new findings after done, and no rage-bait or click-bait hooks, teasers, or manufactured follow-up questions. Scope the full job up front, ship it in one pass."
 scope: portable
-alwaysApply: true
 depends_on:
   - .claude/rules/boil-the-lake.md
   - .claude/rules/goal-contracts.md

@@ -1,8 +1,8 @@
 ---
 description: "Meeting notes must use nested bullet format with action items section"
 scope: project
-globs: ["Meetings/**/*.md"]
-alwaysApply: false
+paths:
+  - "Meetings/**/*.md"
 depends_on:
   - Meetings/Example_meeting_January_06.md
 depended_by:
