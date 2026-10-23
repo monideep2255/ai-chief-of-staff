@@ -38,14 +38,14 @@ Reasoning model (Opus), after the workers return:
 - Synthesize the parts into the deliverable and own final judgment. Workers produce parts, the planner assembles the whole.
 
 Worker models (Sonnet 5, or Haiku 4.5 for purely mechanical work):
-- One bounded task each, in parallel, writing structured output to a named file, returning a short summary so the planner's context stays lean.
+- One bounded task each, in parallel, writing any code or data output to a named path and returning a short text report so the planner's context stays lean.
 
 ### How to apply
 
 - Pass `model: "sonnet"` (or `"haiku"`) to the Agent tool for execution subagents. Default execution to Sonnet. Drop to Haiku only for purely mechanical work (grep-and-list, format conversion). Keep Opus for the plan and the synthesis.
 - Scout before you decompose. The planner reads enough of the terrain to carve non-overlapping slices.
 - Each worker task is self-contained: it names the files or scope, the output path, and the done-when. A worker should never need to coordinate with a sibling mid-run.
-- Keep the worker's output off the planner's context: workers write to files, return a short summary, and the planner reads the files when assembling. This is a hard requirement, not a preference, and the worker's task contract states it: name the output file path in the contract and cap the return at roughly 300 words. A worker that returns its full report writes that report into the planner's context once and then re-reads it on every remaining turn of the session, which is how a cheap fan-out turns expensive after the fact. See the context-economy section of `parallel-first`.
+- Keep the worker's output off the planner's context: workers write code and data outputs to their paths and return a short text report, and the planner reads those outputs when assembling. The harness refuses subagent report-file writes, so the coordinator writes any report file from the worker's return. This is a hard requirement, not a preference, and the worker's task contract states it: name the output paths in the contract and cap the return at roughly 300 words. A worker that returns its full report writes that report into the planner's context once and then re-reads it on every remaining turn of the session, which is how a cheap fan-out turns expensive after the fact. See the context-economy section of `parallel-first`.
 
 ### When to apply
 

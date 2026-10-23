@@ -97,7 +97,7 @@ Per `.claude/rules/plan-then-fan-out.md`, the orchestrating model gathers the da
 
 ### Context economy
 
-Per the context-economy section of `parallel-first.md`, each audit worker writes its findings to its own file under the scratchpad directory and returns roughly 150 to 300 words naming that path plus its headline findings. A worker never returns a transcript or a full file listing. The reason in one sentence: a token entering the orchestrator's context is re-read on every later turn, so a worker that pastes its raw findings back makes a cheap fan-out expensive after the fact.
+Per the context-economy section of `parallel-first.md`, each audit worker returns its findings as text of roughly 150 to 300 words, and the orchestrator writes them to that area's file under the scratchpad directory, because the harness refuses subagent report-file writes. A worker never returns a transcript or a full file listing. The reason in one sentence: a token entering the orchestrator's context is re-read on every later turn, so a worker that pastes its raw findings back makes a cheap fan-out expensive after the fact.
 
 Three more rules carry over directly:
 
@@ -182,7 +182,7 @@ Read these files to understand the current system state:
 
 Each of the six areas below (rules, skills, workflows, memory, documentation, growth system) is an independent worker. Per the dispatch gate in "Parallel execution and token economy" above, none of these areas reads another's output and none writes another's file, so dispatch all six in parallel rather than running through them one after another.
 
-Each worker writes its findings to its own file under the scratchpad directory, named for the area, for example `rules-audit.md`, `skills-audit.md`, `workflows-audit.md`, `memory-audit.md`, `documentation-audit.md`, and `growth-audit.md`. Writing to different files means the six areas never collide. The orchestrator does not read those files in full: it reads each worker's bounded return, and opens a findings file only when a specific finding needs the detail to be scored in Step 3.
+Each worker's findings go to their own file under the scratchpad directory, written by the orchestrator from the worker's return and named for the area, for example `rules-audit.md`, `skills-audit.md`, `workflows-audit.md`, `memory-audit.md`, `documentation-audit.md`, and `growth-audit.md`. Writing to different files means the six areas never collide. The orchestrator does not read those files in full: it reads each worker's bounded return, and opens a findings file only when a specific finding needs the detail to be scored in Step 3.
 
 Run through each area systematically. For each, ask these diagnostic questions:
 
