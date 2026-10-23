@@ -22,7 +22,26 @@ depended_by:
 
 Run these stages in sequence:
 
-## Step 1: docs sync
+## Step 1: pull first
+
+Sync with the remote before any later stage reads or edits a file. A ship that starts on a stale `main` fails two ways: docs-sync writes index entries against content that is about to change underneath it, and the push in the last stage is rejected for being behind.
+
+```bash
+git pull --ff-only
+git rev-parse HEAD origin/main
+```
+
+`--ff-only` is the point of the flag. A fast-forward is safe and silent. Anything else means local and remote have diverged, and that is a stop rather than something to merge past on the way to a push.
+
+Three outcomes, handled differently:
+
+- `Already up to date`: continue to Step 2.
+- Fast-forwarded: name each commit that arrived, one line apiece, before continuing. A pulled commit can make a Step 2 doc edit unnecessary or wrong, so the later stages need to know what landed.
+- Refused, whether for divergence, a dirty tree blocking the merge, or no upstream: stop the ship here and report it. Never fall back to `--rebase`, `--no-ff`, or a force of any kind to get past it. The owner decides how a divergence is resolved.
+
+Record the pre-pull hash in the final report, per "snapshot before mutate" in `.claude/rules/system-design-patterns.md`, so the run has a known revert point.
+
+## Step 2: docs sync
 
 Use the `docs-sync` sub-agent to synchronize all documentation files.
 
@@ -33,7 +52,7 @@ Read `.claude/agents/docs-sync.md` for the full agent instructions. Key points:
 4. Make surgical edits  -  never rewrite files
 5. Report what changed
 
-## Step 2: clean the working tree
+## Step 3: clean the working tree
 
 After docs-sync, remove three kinds of litter so they do not pile up in the working tree: Claude Code's empty `.cc-writes` staging folders, macOS `.DS_Store` files, and agent scratch files written inside the repository instead of the session scratchpad. Standing owner permission was granted for all three, so run this without asking.
 
@@ -66,7 +85,7 @@ Vendored dependency trees and transient working copies are pruned from the walk 
 
 All three passes skip symlinked directories, which keeps the walk out of any external repos referenced from this repo. Everything the script deletes is gitignored or untracked, so this step changes nothing in the commit; it only keeps the tree clean.
 
-## Step 3: git sync
+## Step 4: git sync
 
 After the cleanup, use the `git-sync` sub-agent to commit and push.
 
@@ -82,6 +101,7 @@ Read `.claude/agents/git-sync.md` for the full agent instructions. Key points:
 
 Do not report the ship as done until every line is checked. A step that could not run is unrun, not passed, and is reported as such per `.claude/rules/goal-contracts.md`.
 
+- [ ] `git pull --ff-only` ran before every other stage, and it either reported up to date or fast-forwarded cleanly with each arriving commit named. A refused pull is a stopped ship, not a ship that continues
 - [ ] docs-sync ran, and every doc the routing table flagged was either edited or explicitly ruled out
 - [ ] Any verification script this repo runs exited 0, and the exit code checked is the script's own. Piping a script through `tail` or `head` and reading `$?` returns the pipe's status, not the script's, which is how a red gate reads as green
 - [ ] `clean-cc-writes.py` ran and exited 0, its output carried no `WARNING:` line, and the working tree holds no stray `.cc-writes` folders, `.DS_Store` files, or scratch files and folders. A `WARNING:` means a pass found targets and removed none, which is unrun rather than clean; the usual cause is the sandbox blocking `.cc-writes`, so re-run with it disabled
@@ -94,6 +114,7 @@ Do not report the ship as done until every line is checked. A step that could no
 
 ## Important
 
+- Pull before anything else. Every later stage assumes the working tree already matches the remote, and the push at the end assumes it too
 - Always run docs-sync BEFORE git-sync (docs may create additional changes to commit)
 - Run the working-tree cleanup (.cc-writes folders, .DS_Store files, and scratch files and folders) after docs-sync and before git-sync so the tree is clean before the commit
 - Never widen the scratch patterns to a substring match to catch one more file. The anchored match is what keeps a `_templates/` folder and every virtualenv `tmpdir.py` alive, and widening it to reach a stubborn file is the verify-surface change `goal-contracts` forbids. Add a new whole-name pattern instead
