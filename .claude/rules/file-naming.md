@@ -19,6 +19,7 @@ Use sentence case, the same rules as headings. Capitalize only the first word, p
 | Meeting notes (numbered) | `{number}_Meeting:{topic} {Month} {Day}.md` | `2_Meeting:technical_refinement_January_20.md` |
 | Meeting notes (person) | `{number}_Meeting_{Person}_{Month}_{Day}.md` | `2_Meeting_Priya_January_22.md` |
 | Meeting prep | `Prep_for_{Month}_{Day}.md` | `Prep_for_January_20.md` |
+| Meeting subfolder | `NN_Month-DD`, numbered in date order, never a bare date; renumber when an earlier meeting is added | `Priya-design-reviews/04_October-26/` |
 | Explanations | `Concept_explained.md` | `Meridian_project_explained.md` |
 | Decisions | `Topic_decision.md` | `Neo4j_vs_ArangoDB_decision.md` |
 | Questions | `Questions_for_X.md` | `Questions_for_first_WG_meeting.md` |

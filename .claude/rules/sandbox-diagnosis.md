@@ -39,11 +39,15 @@ After that, pushes ride the already-allowlisted HTTPS path with no override. `gi
 
 ### Worked example: git pull into protected paths
 
-`git pull` failed under the sandbox because the incoming commits rewrote files under `.claude/skills/`, which sit on the sandbox write-protection list. The fetch itself succeeded, HTTPS reached GitHub fine; only the working-tree checkout was denied ("unable to unlink old '.claude/skills/.../SKILL.md': Operation not permitted"). This is a Layer-1 filesystem deny, not a network problem, so `/sandbox` does nothing for it. A pull is a legitimate, named write to protected paths, so the durable fix is to rerun it once with the sandbox off:
+`git pull` failed under the sandbox because the incoming commits rewrote files under `.claude/skills/`, which sit on the sandbox write-protection list. The fetch itself succeeded, HTTPS reached GitHub fine; only the working-tree checkout was denied ("unable to unlink old '.claude/skills/.../SKILL.md': Operation not permitted"). This is a Layer-1 filesystem deny, not a network problem, so `/sandbox` does nothing for it. A pull is a legitimate, named write to protected paths, so the sandbox override is correct for the write. The durable fix is to never pull in one step:
 
 ```bash
-git pull origin main   # dangerouslyDisableSandbox: true
+git fetch origin                                                   # sandboxed; the only network step
+git diff --name-only HEAD origin/main | grep -E '^\.(claude|agents)/'   # any output means protected paths are incoming
+git merge --ff-only origin/main                                    # dangerouslyDisableSandbox: true only when the grep printed paths
 ```
+
+The split matters twice. The protected-path check runs before any file is touched, so the half-applied tree below never forms. And the merge needs no network, so a sandbox-off retry cannot fail to reach the remote. `git-sync` and `/ship` Step 1 both use this form.
 
 The trap: the first sandboxed attempt does not fail cleanly. Git begins the fast-forward checkout, mutates some files, then aborts when it hits the first protected path, leaving a half-applied working tree (files deleted or modified toward the target while HEAD still points at the old commit). Do not retry the pull on top of that mess. Git refuses with "local changes would be overwritten" and "untracked files would be overwritten," because the half-applied changes now look like local edits.
 
@@ -52,7 +56,7 @@ Recover to the last good commit first, then pull clean:
 ```bash
 git reset --hard HEAD          # revert the half-applied tracked changes (sandbox off for protected paths)
 git clean -fd <scoped path>    # remove untracked files the abort scattered, scope to the touched dir
-git pull origin main           # clean fast-forward (sandbox off)
+git merge --ff-only origin/main   # clean fast-forward (sandbox off; the fetch already ran, so no network)
 ```
 
 This recovery is safe only when the tree was clean before the pull, so confirm that first (`git status --short` empty at the start). `reset --hard` and `clean` discard uncommitted work, so if the pre-pull tree held real local edits, stash them instead. Before assuming the incoming "deletions" are real, read what the commits actually do (`git diff --stat <old> origin/main`): a folder reorganization shows as `rename ... (100%)`, not a delete, so nothing is lost. Prove the result the same way as a push: `git rev-parse HEAD origin/main` must match and `git status --short` must be empty.

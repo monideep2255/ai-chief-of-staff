@@ -32,10 +32,12 @@ When the user says any of these, activate immediately:
 ### Pull (sync from GitHub)
 ```bash
 cd "/path/to/your/repo"
-git pull
+git fetch origin                                                   # sandboxed; the only network step
+git diff --name-only HEAD origin/main | grep -E '^\.(claude|agents)/'   # any output means protected paths are incoming
+git merge --ff-only origin/main                                    # sandbox off only when the grep printed paths
 ```
 
-If the incoming commits rewrite files under `.claude/` (skills, agents, hooks, rules), the sandbox denies the working-tree write ("Operation not permitted" on a `.claude/` path). This is a Layer-1 filesystem deny, not a network issue: rerun the pull once with the sandbox off. See the git pull worked example in `.claude/rules/sandbox-diagnosis.md`.
+Never run a bare `git pull` here. If the incoming commits rewrite files under `.claude/` or `.agents/`, a sandboxed pull aborts halfway with "Operation not permitted" and leaves a half-applied tree, and a sandbox-off pull can then fail on the network instead. A fetch first decides the sandbox question before any file is touched, and the merge needs no network. See the git pull worked example in `.claude/rules/sandbox-diagnosis.md`.
 
 ### Push (sync to GitHub)
 ```bash

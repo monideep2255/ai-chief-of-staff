@@ -27,9 +27,13 @@ Run these stages in sequence:
 Sync with the remote before any later stage reads or edits a file. A ship that starts on a stale `main` fails two ways: docs-sync writes index entries against content that is about to change underneath it, and the push in the last stage is rejected for being behind.
 
 ```bash
-git pull --ff-only
+git fetch origin                                                   # sandboxed; this is the only step that needs the network
+git diff --name-only HEAD origin/main | grep -E '^\.(claude|agents)/'   # any output means protected paths are incoming
+git merge --ff-only origin/main                                    # sandbox off only when the grep printed paths
 git rev-parse HEAD origin/main
 ```
+
+The pull is split in two because a sandboxed `git pull` that reaches a `.claude/` or `.agents/` path aborts halfway and leaves a half-applied tree. A fetch first, then a check of the incoming paths, decides the sandbox question before any file is touched, and the merge needs no network, so a sandbox-off merge cannot fail on connectivity. See the git pull worked example in `.claude/rules/sandbox-diagnosis.md`.
 
 `--ff-only` is the point of the flag. A fast-forward is safe and silent. Anything else means local and remote have diverged, and that is a stop rather than something to merge past on the way to a push.
 
@@ -101,7 +105,7 @@ Read `.claude/agents/git-sync.md` for the full agent instructions. Key points:
 
 Do not report the ship as done until every line is checked. A step that could not run is unrun, not passed, and is reported as such per `.claude/rules/goal-contracts.md`.
 
-- [ ] `git pull --ff-only` ran before every other stage, and it either reported up to date or fast-forwarded cleanly with each arriving commit named. A refused pull is a stopped ship, not a ship that continues
+- [ ] The fetch, protected-path check, and `git merge --ff-only origin/main` ran before every other stage, and it either reported up to date or fast-forwarded cleanly with each arriving commit named. A refused pull is a stopped ship, not a ship that continues
 - [ ] docs-sync ran, and every doc the routing table flagged was either edited or explicitly ruled out
 - [ ] Any verification script this repo runs exited 0, and the exit code checked is the script's own. Piping a script through `tail` or `head` and reading `$?` returns the pipe's status, not the script's, which is how a red gate reads as green
 - [ ] `clean-cc-writes.py` ran and exited 0, its output carried no `WARNING:` line, and the working tree holds no stray `.cc-writes` folders, `.DS_Store` files, or scratch files and folders. A `WARNING:` means a pass found targets and removed none, which is unrun rather than clean; the usual cause is the sandbox blocking `.cc-writes`, so re-run with it disabled
