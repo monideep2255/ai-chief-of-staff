@@ -17,12 +17,13 @@ depended_by:
 
 The sandbox is a security boundary. `dangerouslyDisableSandbox: true` removes it for one command. Reaching for it on the first failure trades that boundary for convenience and hides a fixable root cause. Before you disable anything, classify the failure. Most sandbox failures have a durable fix that keeps the boundary intact.
 
-### The three failure classes
+### The four failure classes
 
 | Symptom | Class | Durable fix | Override needed? |
 |---------|-------|-------------|------------------|
-| "Operation not permitted", "could not lock", write blocked to a path outside the allowlist | Filesystem deny | Write to an allowed path (scratchpad, repo dir). If a protected path legitimately must change (e.g. `.git/config`), that one write needs the override. A `git pull` whose incoming commits rewrite protected paths (e.g. `.claude/skills/`) is one named operation and takes the override for the whole pull. | Only for the single protected-path write, or a named protected-path operation such as a pull |
+| "Operation not permitted", "could not lock", write blocked to a path outside the allowlist | Filesystem deny | Write to an allowed path (scratchpad, repo dir). If a protected path legitimately must change (e.g. `.git/config`), that one write needs the override. A `git pull` whose incoming commits rewrite protected paths (e.g. `.claude/skills/`) is one named operation and takes the override for the fast-forward step only: fetch sandboxed, check the incoming paths, then run `git merge --ff-only origin/main` once with the override. | Only for the single protected-path write, or a named protected-path operation such as that fast-forward |
 | Connection refused or blocked to an `https://` host | Network Layer-7 | The proxy allows HTTPS to allowlisted hosts. Add the host with `/sandbox`. | No |
+| `OSStatus -26276`, `SSLCertVerificationError`, or `x509: failed to verify certificate` while the host is already allowed | macOS trust service blocked | The sandbox blocks the macOS certificate trust service, so allowlisting the host cannot help. Python tools: set `PIP_USE_DEPRECATED=legacy-certs` as an environment variable, or point the tool at certifi. Go binaries (`rclone`, `gh`) ignore `SSL_CERT_FILE` on macOS and have no in-sandbox fix: run that one read-only command with the sandbox off, with secrets in environment variables, never arguments | Python: no. Go binaries: yes, one read-only command at a time |
 | Connection fails to a raw TCP or SSH endpoint (e.g. `git@github.com:22`) | Network Layer-4 | The HTTP proxy cannot tunnel raw SSH regardless of allowlist. Switch the tool to HTTPS (e.g. `git remote set-url` to `https://`). | Only as a last resort if no HTTPS path exists |
 
 The load-bearing line: `/sandbox` tunes the HTTPS allowlist. It cannot make SSH work. If the failure is SSH, do not add hosts to the allowlist and do not disable the sandbox. Switch to HTTPS.
@@ -81,11 +82,11 @@ Do not capture a verbose HTTPS auth trace to prove a push. `GIT_CURL_VERBOSE=1` 
 ### Three-state permissions
 
 Allow:
-- Classify a sandbox failure into one of the three classes before acting
+- Classify a sandbox failure into one of the four classes before acting
 - Add an HTTPS host to the allowlist via `/sandbox` for a Layer-7 block
 - Apply a durable protocol switch (SSH to HTTPS) for a Layer-4 block
 - Retry once with `dangerouslyDisableSandbox` for a single, named, protected-path write that legitimately must happen (e.g. `.git/config`), or a named protected-path operation such as a `git pull` whose incoming commits rewrite `.claude/` files
-- Recover a half-applied pull with `git reset --hard HEAD` plus a scoped `git clean`, then re-pull, but only when the tree was verified clean before the pull
+- Recover a half-applied pull with `git reset --hard HEAD` plus a scoped `git clean`, then fetch and fast-forward with `git merge --ff-only origin/main` rather than pulling again, but only when the tree was verified clean before the pull
 
 Ask:
 - Before disabling the sandbox for anything broader than a single named command
@@ -96,4 +97,4 @@ Deny:
 - Never claim a fix worked without evidence from the actual command path
 - Never capture a verbose HTTPS auth trace (`GIT_CURL_VERBOSE`, `GIT_TRACE_CURL`) to prove a push; `GIT_TRACE_REDACT` does not cover the HTTP/2 frame trace, so the token leaks in cleartext. Prove with the hash comparison instead.
 
-The test: before disabling the sandbox, did I classify the failure (filesystem, Layer-7 HTTPS, or Layer-4 SSH) and try the durable fix that keeps the boundary intact?
+The test: before disabling the sandbox, did I classify the failure (filesystem, Layer-7 HTTPS, Layer-4 SSH, or blocked macOS trust) and try the durable fix that keeps the boundary intact?
