@@ -112,6 +112,8 @@ The honest baseline is the more rigorous option, not a cheaper lower-rigor one. 
 
 Count the whole bill, not only the model tokens. When an arm calls a helper tool that bills on its own (a judgment API, a reranker, a hosted search), add that tool's charges to the arm's cost and report each component separately: model tokens, each helper tool, infrastructure. A cost that could not be measured is reported as unknown, never as zero, because an unknown cost read as zero makes the tool-assisted arm look cheaper than it is. Source: the jevgrep repository dive, applied after an A/B comparison where hundreds of billed helper-tool calls sat outside the token count.
 
+Report the difference as an interval, judged blind. The judge never sees which arm produced an output, and it gives three verdicts per claim (supported, unsupported, contradicted) rather than pass or fail, since a contradicted claim is worse than a missing one. Report each difference between arms with a 95 percent bootstrap interval, resampled within each query class or source so one easy class cannot carry the result. An interval that includes zero is reported as "no difference shown", never as a small win. Put cost and latency in the same table as quality, so a cheaper arm's quality loss is visible beside its saving. Source: the GitDiagram repository dive, where a model swap was rejected on an interval of +6.7 to +13.0 points more unsupported arrows, and a second arm's interval of 0.0 to +7.2 was read as no difference.
+
 ### Measured versus projected
 
 A figure after a fix is a measurement only when the frozen case set was rerun through the change that actually shipped. Anything else is a projection, and it is written as one.
