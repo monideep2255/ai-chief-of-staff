@@ -21,20 +21,46 @@ is the match instead: the basename must be exactly ".DS_Store", and the path mus
 be a regular file, never a directory and never a symlink. macOS regenerates these
 on folder access, so removing them loses nothing.
 
-Scratch paths have neither protection, so they carry three guards of their own.
+Scratch paths have neither protection, so they carry six guards of their own,
+numbered First to Sixth below. Nested repositories get their own paragraph after.
 
-First, every match is anchored, never a substring. A substring match on "temp" or
-"scratch" hits real work in almost any repository: a _templates/ folder, a
-document about temporal data, and every tmpdir.py inside a virtualenv. A name
-therefore matches only as a whole basename, a whole stem before the first
-extension, or a whole trailing suffix.
+First, every match is anchored, never a substring or a prefix. A substring match
+on "temp" or "scratch" hits real work in almost any repository: a _templates/
+folder, a document about temporal data, and every tmpdir.py inside a
+virtualenv. A name therefore matches only as a whole basename,
+a whole stem (the name with its one final extension removed), or a whole
+trailing suffix. A stem is "untitled" alone or "untitled" plus a number, as in
+"Untitled 2.md", so Untitled_grant_draft.md and temp.sensor.readings.md are kept.
 
 Second, git decides what is real. A path git tracks is reported and never
 deleted, because a file committed on purpose may hold real work whatever it is
-named. The owner decides each of those individually.
+named. The comparison is casefolded and NFC-normalized on both sides, so a
+case-insensitive file system cannot hide a tracked folder. The owner decides each
+of those individually.
 
 Third, external checkouts and vendored dependency trees are pruned from the walk
 entirely, so this never reaches into a repository that is not ours.
+
+Fourth, resolved scratch targets must remain inside this repository and cannot
+be the repository root. Symlink and junction directories are never removed.
+
+Fifth, ignored folders and ignored files are off limits. Git's tracked-file guard
+cannot see inside a gitignored folder, so a scratch-named folder there (for
+example outputs/run/tmp) can hold untracked work that exists nowhere else. The
+scratch pass therefore skips any target that `git check-ignore -q` reports as
+ignored, and any folder where `git ls-files -o -i --exclude-standard` lists an
+ignored file (for example a data.csv under a *.csv pattern), unless
+--include-ignored is passed. If git cannot answer, the target counts as ignored.
+The .cc-writes and .DS_Store passes are exempt: their targets are gitignored by
+design.
+
+Sixth, nested repositories are never entered, in any pass. A directory below the
+repository root that holds a .git entry (a directory, a worktree file, or a
+symlink, tested with os.path.lexists) is another repository. The walk does not
+descend into it or target it, and a final guard before each removal checks every
+ancestor of the target up to the repository root for the same .git entry. Before
+a folder target is removed, the guard also walks the folder itself and skips it
+if any level below holds a .git entry.
 
 All three passes use followlinks=False, which keeps the walk out of any symlinked
 external repositories.
@@ -45,12 +71,19 @@ Standing owner permission was granted 2026-07-15 for the .cc-writes cleanup,
 paths are on the sandbox protected list, so deletion is denied under the sandbox.
 
 Usage:
-    python3 .claude/skills/ship/clean-cc-writes.py [--dry-run]
+    python3 .claude/skills/ship/clean-cc-writes.py [--dry-run] [--include-ignored]
+
+--dry-run lists each target with the reason it qualifies and deletes nothing.
+--include-ignored lets the scratch pass remove targets inside gitignored folders.
+Any other argument is an error (exit 2) and nothing is touched.
 """
+import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
+import unicodedata
 
 # repo root is four levels up: .claude/skills/ship/clean-cc-writes.py
 REPO_ROOT = os.path.dirname(
@@ -66,11 +99,14 @@ SCRATCH_DIR_NAMES = frozenset(
     {"scratch", "scratchpad", "_scratch", "tmp", "temp", "_tmp", "_temp"}
 )
 
-# A file whose stem before the first extension is exactly one of these, so
-# scratch.md, tmp.json and temp.py match while templates.py and temporal.md
-# do not. Any stem starting with "untitled" also matches, which covers the
-# "Untitled 2.md" shape editors produce.
+# A file whose stem (the name with its one final extension removed) is exactly
+# one of these, so scratch.md, tmp.json and temp.py match while templates.py,
+# temporal.md and temp.sensor.readings.md do not.
 SCRATCH_FILE_STEMS = frozenset({"scratch", "scratchpad", "temp", "tmp", "untitled"})
+
+# "untitled" alone or followed by a number, the "Untitled 2.md" shape editors
+# produce. Untitled_grant_draft.md does not match.
+UNTITLED_STEM = re.compile(r"untitled( \d+)?")
 
 # A file whose basename ends with one of these.
 SCRATCH_SUFFIXES = (".tmp", ".temp", ".bak", ".orig", ".swp", ".swo", "~")
@@ -124,13 +160,121 @@ def tracked_paths():
 
 
 def is_scratch_file(name):
+    return scratch_file_reason(name) is not None
+
+
+def scratch_file_reason(name):
+    """Why a file name matches the scratch pass, or None when it does not."""
     lowered = name.lower()
     if lowered in SCRATCH_NEVER:
-        return False
+        return None
     if lowered.endswith(SCRATCH_SUFFIXES):
+        return "file name ends with a scratch suffix"
+    stem = os.path.splitext(lowered)[0]
+    if stem in SCRATCH_FILE_STEMS or UNTITLED_STEM.fullmatch(stem):
+        return "file stem is a scratch name"
+    return None
+
+
+# Why each target qualifies, keyed by path. Printed in a dry run.
+REASONS = {}
+
+# Targets and nested repositories left alone: (repo-relative path, reason).
+SKIPPED = []
+
+REASON_NESTED = "nested repository"
+REASON_IGNORED = "ignored, pass --include-ignored"
+REASON_IGNORED_FILES = "holds ignored files, pass --include-ignored"
+REASON_SYMLINK = "symlink"
+
+
+def rel_of(path):
+    return os.path.relpath(path, REPO_ROOT).replace(os.sep, "/")
+
+
+def skip(path, reason):
+    SKIPPED.append((rel_of(path), reason))
+
+
+def nested_repo_at_or_above(path):
+    """Return the first directory from `path` up to (excluding) the repository
+    root that holds a .git entry, else None. lexists covers a .git directory, a
+    .git file as in a worktree, and a .git symlink."""
+    root = os.path.normcase(os.path.abspath(REPO_ROOT))
+    current = os.path.abspath(path)
+    while os.path.normcase(current) != root:
+        if os.path.lexists(os.path.join(current, ".git")):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+    return None
+
+
+def holds_nested_repo(path):
+    """True when `path` or any level below it holds a .git entry. Fails closed:
+    a directory the walk cannot read counts as holding one."""
+    def fail(err):
+        raise err
+
+    try:
+        for dirpath, _dirnames, _files in os.walk(
+            path, followlinks=False, onerror=fail
+        ):
+            if os.path.lexists(os.path.join(dirpath, ".git")):
+                return True
+    except OSError:
         return True
-    stem = lowered.split(".", 1)[0]
-    return stem in SCRATCH_FILE_STEMS or stem.startswith("untitled")
+    return False
+
+
+def holds_ignored_files(path):
+    """True when git lists an ignored file under `path`. Fails closed: a git
+    error counts as holding ignored files."""
+    try:
+        r = subprocess.run(
+            ["git", "-C", REPO_ROOT, "ls-files", "-o", "-i", "--exclude-standard",
+             "-z", "--", rel_of(path)],
+            capture_output=True,
+        )
+    except OSError:
+        return True
+    return r.returncode != 0 or bool(r.stdout)
+
+
+def norm(rel):
+    """Casefolded, NFC-normalized path for comparison on any file system."""
+    return unicodedata.normalize("NFC", rel).casefold()
+
+
+def is_ignored(path):
+    """True when git ignores the path. Fails closed: if git cannot answer
+    (exit 128 or anything but 1), the path counts as ignored."""
+    try:
+        r = subprocess.run(
+            ["git", "-C", REPO_ROOT, "check-ignore", "-q", "--", rel_of(path)],
+            capture_output=True,
+        )
+    except OSError:
+        return True
+    return r.returncode != 1
+
+
+def through_link(path):
+    """Reject a symlink/junction at the target or below the repository root."""
+    root = os.path.normcase(os.path.abspath(REPO_ROOT))
+    current = os.path.abspath(path)
+    while os.path.normcase(current) != root:
+        if os.path.islink(current) or (
+            hasattr(os.path, "isjunction") and os.path.isjunction(current)
+        ):
+            return True
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+    return False
 
 
 def find_targets():
@@ -144,31 +288,71 @@ def find_targets():
         if is_pruned(rel_dir):
             dirnames[:] = []
             continue
+        # Windows junctions can be traversed even with followlinks=False.
+        # Prune aliases before collecting targets for any of the passes.
+        # A child that holds a .git entry is another repository: drop it from
+        # the walk before any pass can match it or anything inside it.
+        walkable = []
+        for d in dirnames:
+            full = os.path.join(dirpath, d)
+            if through_link(full):
+                if d.lower() in SCRATCH_DIR_NAMES:
+                    skip(full, REASON_SYMLINK)
+                continue
+            if (
+                d not in PRUNE_DIR_NAMES
+                and not is_pruned(rel_of(full))
+                and os.path.lexists(os.path.join(full, ".git"))
+            ):
+                skip(full, REASON_NESTED)
+                continue
+            walkable.append(d)
+        dirnames[:] = walkable
         if ".cc-writes" in dirnames:
-            cc_dirs.append(os.path.join(dirpath, ".cc-writes"))
+            cc = os.path.join(dirpath, ".cc-writes")
+            cc_dirs.append(cc)
+            REASONS[cc] = "Claude Code staging folder, removed only if empty"
         if DS_STORE in filenames:
-            ds_files.append(os.path.join(dirpath, DS_STORE))
+            ds = os.path.join(dirpath, DS_STORE)
+            ds_files.append(ds)
+            REASONS[ds] = "macOS metadata file named exactly .DS_Store"
 
         keep = []
         for d in dirnames:
             if d in PRUNE_DIR_NAMES:
                 continue  # vendored or transient: neither walked nor matched
             if d.lower() in SCRATCH_DIR_NAMES:
-                scratch_dirs.append(os.path.join(dirpath, d))
+                full = os.path.join(dirpath, d)
+                scratch_dirs.append(full)
+                REASONS[full] = f"folder name '{d}' is a scratch name"
                 continue  # matched whole, so the folder is judged as one unit
             keep.append(d)
         dirnames[:] = keep
 
         for f in filenames:
-            if is_scratch_file(f):
-                scratch_files.append(os.path.join(dirpath, f))
+            reason = scratch_file_reason(f)
+            if reason:
+                full = os.path.join(dirpath, f)
+                scratch_files.append(full)
+                REASONS[full] = reason
     return cc_dirs, ds_files, scratch_dirs, scratch_files
 
 
 def remove_cc_writes(cc_dirs, dry_run=False):
     removed = []
     for cc in cc_dirs:
+        if nested_repo_at_or_above(cc):
+            skip(cc, REASON_NESTED)
+            continue
         if dry_run:
+            # Match the real run: only an empty folder would be removed.
+            try:
+                empty = not os.listdir(cc)
+            except OSError:
+                empty = False
+            if not empty:
+                print(f"skip (not empty or gone): {cc}", file=sys.stderr)
+                continue
             removed.append(cc)
             continue
         try:
@@ -183,8 +367,11 @@ def remove_cc_writes(cc_dirs, dry_run=False):
             and os.path.isdir(parent)
             and not os.listdir(parent)
         ):
-            os.rmdir(parent)
-            removed.append(parent)
+            try:
+                os.rmdir(parent)
+                removed.append(parent)
+            except OSError as e:
+                print(f"skip (could not remove): {parent} ({e})", file=sys.stderr)
     return removed
 
 
@@ -197,6 +384,9 @@ def remove_ds_store(ds_files, dry_run=False):
         if os.path.islink(ds) or not os.path.isfile(ds):
             print(f"skip (not a regular file): {ds}", file=sys.stderr)
             continue
+        if nested_repo_at_or_above(ds):
+            skip(ds, REASON_NESTED)
+            continue
         if dry_run:
             removed.append(ds)
             continue
@@ -208,22 +398,67 @@ def remove_ds_store(ds_files, dry_run=False):
     return removed
 
 
-def remove_scratch(scratch_dirs, scratch_files, tracked, dry_run=False):
+def remove_scratch(
+    scratch_dirs, scratch_files, tracked, dry_run=False, include_ignored=False
+):
     """Delete untracked scratch matches. Report tracked ones, never delete them.
 
-    Returns (removed, reported). A tracked match is something committed on
-    purpose, so the call to remove it stays with the owner.
+    Returns (removed, reported, skipped_count). A tracked match is something
+    committed on purpose, so the call to remove it stays with the owner. A
+    nested-repository or ignored match is skipped and listed in SKIPPED.
     """
+    skipped_before = len(SKIPPED)
+
+    def blocked(path):
+        # Final guards, just before removal. Nested repository first, then the
+        # ignored check that this pass alone applies.
+        if nested_repo_at_or_above(path):
+            skip(path, REASON_NESTED)
+            return True
+        is_dir = os.path.isdir(path) and not os.path.islink(path)
+        if is_dir and holds_nested_repo(path):
+            skip(path, REASON_NESTED)
+            return True
+        if not include_ignored:
+            if is_ignored(path):
+                skip(path, REASON_IGNORED)
+                return True
+            if is_dir and holds_ignored_files(path):
+                skip(path, REASON_IGNORED_FILES)
+                return True
+        return False
+
+    tracked_norm = [norm(t) for t in tracked]
+    tracked_set = set(tracked_norm)
+
     removed = []
     reported = []
 
+    def contained(path):
+        # Resolve symlinks/junctions before any removal, including dry runs.
+        # Refuse the repository root itself and targets outside it.
+        root = os.path.realpath(REPO_ROOT)
+        target = os.path.realpath(path)
+        try:
+            return target != root and os.path.commonpath([root, target]) == root
+        except ValueError:  # Different Windows drives have no common path.
+            return False
+
     for path in scratch_files:
-        rel = os.path.relpath(path, REPO_ROOT)
-        if rel in tracked:
+        rel = os.path.relpath(path, REPO_ROOT).replace(os.sep, "/")
+        if norm(rel) in tracked_set:
             reported.append(rel)
+            continue
+        if through_link(path):
+            skip(path, REASON_SYMLINK)
+            continue
+        if not contained(path):
+            print(f"skip (outside repository or root): {rel}", file=sys.stderr)
             continue
         if os.path.islink(path) or not os.path.isfile(path):
             print(f"skip (not a regular file): {rel}", file=sys.stderr)
+            continue
+        if blocked(path):
             continue
         if dry_run:
             removed.append(path)
@@ -235,16 +470,24 @@ def remove_scratch(scratch_dirs, scratch_files, tracked, dry_run=False):
             print(f"skip (could not remove): {rel} ({e})", file=sys.stderr)
 
     for path in scratch_dirs:
-        rel = os.path.relpath(path, REPO_ROOT)
-        prefix = rel + "/"
-        held = sorted(t for t in tracked if t == rel or t.startswith(prefix))
+        # Git's index uses forward slashes on every platform.
+        rel = os.path.relpath(path, REPO_ROOT).replace(os.sep, "/")
+        prefix = norm(rel) + "/"
+        held = sorted(
+            t for t in tracked_norm if t == norm(rel) or t.startswith(prefix)
+        )
         if held:
             reported.append(
                 f"{rel}/ holds {len(held)} tracked file(s), first is {held[0]}"
             )
             continue
-        if os.path.islink(path):
-            print(f"skip (symlink): {rel}", file=sys.stderr)
+        if through_link(path):
+            skip(path, REASON_SYMLINK)
+            continue
+        if not contained(path):
+            print(f"skip (outside repository or root): {rel}", file=sys.stderr)
+            continue
+        if blocked(path):
             continue
         if dry_run:
             removed.append(path)
@@ -255,7 +498,7 @@ def remove_scratch(scratch_dirs, scratch_files, tracked, dry_run=False):
         except OSError as e:
             print(f"skip (could not remove): {rel} ({e})", file=sys.stderr)
 
-    return removed, reported
+    return removed, reported, len(SKIPPED) - skipped_before
 
 
 def report(label, paths, found=0, dry_run=False):
@@ -278,7 +521,8 @@ def report(label, paths, found=0, dry_run=False):
     verb = "Would remove" if dry_run else "Removed"
     print(f"{verb} {len(paths)} {label}:")
     for p in paths:
-        print("  -", os.path.relpath(p, REPO_ROOT))
+        why = f"  [{REASONS[p]}]" if dry_run and p in REASONS else ""
+        print("  -", os.path.relpath(p, REPO_ROOT) + why)
     # The .cc-writes pass can remove an emptied .claude parent too, so a count
     # above `found` is expected and only a shortfall is worth warning about.
     if len(paths) < found:
@@ -288,19 +532,51 @@ def report(label, paths, found=0, dry_run=False):
         )
 
 
-def main():
-    dry_run = "--dry-run" in sys.argv[1:]
+def parse_args(argv=None):
+    """Parse before any filesystem walk: --help exits 0, an unknown argument
+    exits 2, and in both cases nothing has been touched."""
+    parser = argparse.ArgumentParser(
+        prog="clean-cc-writes.py",
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        allow_abbrev=False,
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="list targets and the reason each qualifies, delete nothing",
+    )
+    parser.add_argument(
+        "--include-ignored",
+        action="store_true",
+        help="let the scratch pass remove targets inside gitignored folders",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    dry_run = args.dry_run
     if dry_run:
         print("DRY RUN: nothing will be deleted.\n")
 
     cc_dirs, ds_files, scratch_dirs, scratch_files = find_targets()
+    mark = len(SKIPPED)
+    cc_removed = remove_cc_writes(cc_dirs, dry_run)
     report(
         "empty .cc-writes folders",
-        remove_cc_writes(cc_dirs, dry_run),
-        len(cc_dirs),
+        cc_removed,
+        len(cc_dirs) - (len(SKIPPED) - mark),
         dry_run,
     )
-    report(".DS_Store files", remove_ds_store(ds_files, dry_run), len(ds_files), dry_run)
+    mark = len(SKIPPED)
+    ds_removed = remove_ds_store(ds_files, dry_run)
+    report(
+        ".DS_Store files",
+        ds_removed,
+        len(ds_files) - (len(SKIPPED) - mark),
+        dry_run,
+    )
 
     try:
         tracked = tracked_paths()
@@ -310,15 +586,22 @@ def main():
         # widening it.
         print(
             f"SCRATCH PASS SKIPPED: could not read the git index ({e}). "
-            "Nothing was deleted. Re-run inside the repository.",
+            "No scratch file or folder was deleted. The passes above this line "
+            "ran as reported. Re-run inside the repository.",
             file=sys.stderr,
         )
         return 1
 
-    removed, reported = remove_scratch(scratch_dirs, scratch_files, tracked, dry_run)
-    # Tracked matches are reported on purpose, so they are not a shortfall.
-    deletable = len(scratch_dirs) + len(scratch_files) - len(reported)
+    removed, reported, skipped_n = remove_scratch(
+        scratch_dirs, scratch_files, tracked, dry_run, args.include_ignored
+    )
+    # Tracked and skipped matches are left on purpose, so they are not a shortfall.
+    deletable = len(scratch_dirs) + len(scratch_files) - len(reported) - skipped_n
     report("scratch files and folders", removed, deletable, dry_run)
+    if SKIPPED:
+        print(f"\nSKIPPED, NOT DELETED: {len(SKIPPED)} target(s)")
+        for rel, reason in SKIPPED:
+            print(f"  ~ {rel} ({reason})")
     if reported:
         print(
             f"\nREPORTED, NOT DELETED: {len(reported)} git-tracked scratch match(es)"

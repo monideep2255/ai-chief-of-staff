@@ -66,28 +66,36 @@ Run the cleanup script with the sandbox disabled (the `.cc-writes` paths sit on 
 python3 .claude/skills/ship/clean-cc-writes.py
 ```
 
-Add `--dry-run` to list what would go without deleting anything. Use it when the scratch pass reports something you did not expect.
+Add `--dry-run` to list what would go, with the reason each target qualifies, without deleting anything. Use it when the scratch pass reports something you did not expect. Add `--include-ignored` only when the owner wants scratch folders inside gitignored folders removed too. `--help` prints usage and exits 0. Any other argument is an error, exits 2, and touches nothing, because the script parses its arguments before it reads the filesystem.
+
+Targets the script leaves alone are listed under `SKIPPED, NOT DELETED`, each with a reason: `nested repository`, `ignored, pass --include-ignored`, `holds ignored files, pass --include-ignored`, or `symlink`. Read that list too.
 
 How each pass stays safe:
 
 - `.cc-writes` folders: the script uses `os.rmdir`, which removes empty directories only, so it can never delete a folder that holds a real file, and the main `.claude/` is never empty so it stays protected. It also removes any spurious `.claude` parent left empty.
 - `.DS_Store` files: `os.remove` is a real unlink, so the guard is the match instead. The basename must be exactly `.DS_Store`, and the path must be a regular file, never a directory and never a symlink. macOS regenerates these on folder access, so removing them loses nothing.
-- Scratch files and folders: three guards, because this pass has neither of the protections above. The match is anchored, git decides what is real, and vendored trees are pruned. Each one is spelled out below.
+- Scratch files and folders: six guards, because this pass has neither of the protections above. The match is anchored, git decides what is real, vendored trees are pruned, resolved targets must stay inside the repository, nested repositories are never entered, and ignored folders are skipped. Each one is spelled out below.
 
 What the scratch pass matches, always as a whole name and never as a substring:
 
 - Folders named exactly `scratch`, `scratchpad`, `_scratch`, `tmp`, `temp`, `_tmp`, or `_temp`
-- Files whose stem before the first extension is exactly `scratch`, `scratchpad`, `temp`, or `tmp`, so `tmp.json` matches and `templates.py` does not
-- Files whose stem starts with `untitled`, which covers the `Untitled 2.md` shape editors produce
+- Files whose stem (the name minus its one final extension) is exactly `scratch`, `scratchpad`, `temp`, or `tmp`, so `tmp.json` matches while `templates.py` and `temp.sensor.readings.md` do not
+- Files whose stem is `untitled` alone or `untitled` plus a number, which covers the `Untitled 2.md` shape editors produce, while `Untitled_grant_draft.md` stays
 - Files ending in `.tmp`, `.temp`, `.bak`, `.orig`, `.swp`, `.swo`, or `~`
 
-Anchoring is the load-bearing guard, not a refinement. A substring match on `temp` or `scratch` hits real work in almost any repository: a `_templates/` folder, a document about temporal data, and every `tmpdir.py` inside a virtualenv.
+The anchored match is the load-bearing guard, not a refinement. A substring match on `temp` or `scratch` hits real work in almost any repository: a `_templates/` folder, a document about temporal data, and every `tmpdir.py` inside a virtualenv.
 
-Git decides what is real. A scratch-named path that git tracks is printed under `REPORTED, NOT DELETED` and left alone, because a file committed on purpose may hold real work whatever it is named. Read that list and decide each one yourself; the script never makes that call. If the git index cannot be read, the whole scratch pass is skipped and the script exits 1, since without the tracked set every match would look deletable.
+Git decides what is real, and the comparison ignores case and Unicode form, so a case-insensitive file system cannot hide a tracked folder. A scratch-named path that git tracks is printed under `REPORTED, NOT DELETED` and left alone, because a file committed on purpose may hold real work whatever it is named. Read that list and decide each one yourself; the script never makes that call. If the git index cannot be read, the whole scratch pass is skipped and the script exits 1, since without the tracked set every match would look deletable.
 
 Vendored dependency trees and transient working copies are pruned from the walk entirely: any `.git`, `node_modules`, `venv`, `.venv`, `env`, `site-packages`, `__pycache__`, or `worktrees` folder.
 
-All three passes skip symlinked directories, which keeps the walk out of any external repos referenced from this repo. Everything the script deletes is gitignored or untracked, so this step changes nothing in the commit; it only keeps the tree clean.
+Nested repositories are never entered, in any pass. A directory below the repository root that holds a `.git` entry (a directory, a worktree file, or a symlink) is another repository, so the walk does not descend into it or target anything inside it. A final check before each removal tests every ancestor of the target up to the repository root for the same entry, and a scratch folder is also walked top to bottom, so one that holds a nested checkout anywhere below is skipped.
+
+Ignored folders are skipped in the scratch pass only. The tracked-file guard cannot see inside a gitignored folder, so a `tmp` folder there can hold untracked work that exists nowhere else. The script asks `git check-ignore -q` about each scratch target and skips an ignored one unless `--include-ignored` is passed. It also skips a folder that holds ignored files, such as a `data.csv` under a `*.csv` pattern. If git cannot answer, the target counts as ignored. The `.cc-writes` and `.DS_Store` passes skip this check, because their targets are gitignored by design.
+
+All three passes skip symlinked directories, which keeps the walk out of any external repositories linked into this one. Everything the script deletes is gitignored or untracked, so this step changes nothing in the commit; it only keeps the tree clean.
+
+Before scratch removal, the script resolves each target and rejects the repository root, paths outside it, and directory junctions. Git comparisons use forward slashes on every platform so tracked paths remain protected on Windows.
 
 ## Step 4: git sync
 
